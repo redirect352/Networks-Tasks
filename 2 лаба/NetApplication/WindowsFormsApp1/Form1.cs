@@ -89,6 +89,7 @@ namespace WindowsFormsApp1
 
                     try
                     {
+                        if (Server != null)
                         if (Server.Name == "Host")
                         {
                             Server.Name = "Stopped";

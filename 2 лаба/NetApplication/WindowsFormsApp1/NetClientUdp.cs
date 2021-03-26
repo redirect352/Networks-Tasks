@@ -100,7 +100,9 @@ namespace WindowsFormsApp1
                 tmp = BitConverter.GetBytes(NetConnector.EndFlag);
                 socket.SendTo(tmp, 4, SocketFlags.None, remotePoint);
 
-
+                MessageBox.Show("Файл отправлен");
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Close();
 
                 /* StringBuilder builder = new StringBuilder();
 

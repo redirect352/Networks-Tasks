@@ -20,7 +20,7 @@ namespace WindowsFormsApp1
         public override void ConnectTo()
         {
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,ProtocolType.Udp);
-            var endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), port);
+            var endPoint = new IPEndPoint(IPAddress.Parse("192.168.43.60"), port);
 
             int bytes;
             byte[] data = new byte[buffersize];
@@ -72,7 +72,8 @@ namespace WindowsFormsApp1
                     int i = 0;
                     do
                     {
-                        bytes = socket.ReceiveFrom(data,ref remoteIp);
+                        if (i<=0)
+                            bytes = socket.ReceiveFrom(data,ref remoteIp);
 
 
 
@@ -86,8 +87,13 @@ namespace WindowsFormsApp1
                                 progress += bytes;
                                 
                                 answer = BitConverter.GetBytes(i);
-                                socket.SendTo(answer, 4, SocketFlags.None, remoteIp);
 
+                                do
+                                { 
+                                    socket.SendTo(answer, 4, SocketFlags.None, remoteIp);
+                                    bytes = socket.ReceiveFrom(data, ref remoteIp);
+                                }
+                                while (bytes <= 0);
                                 i++;
                             }
                         }
