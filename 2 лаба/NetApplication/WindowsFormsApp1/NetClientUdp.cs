@@ -64,14 +64,14 @@ namespace WindowsFormsApp1
                 data = new byte[buffersize];
 
                 int ByteRead = 0, i =0, bytes;
-
+                socket.ReceiveTimeout = 5000;
                 EndPoint endPoint = null;
                 
                 do
                 {
                     ByteRead = F.Read(data, 0,buffersize);
 
-
+                   
                     if (ByteRead > 0)
                     {
                         bool AnswerReceived = false;
@@ -79,7 +79,17 @@ namespace WindowsFormsApp1
                         do
                         {
                             endPoint = new IPEndPoint(IPAddress.Parse(adress), port);
-                            bytes =  socket.ReceiveFrom(data, 4, SocketFlags.None,  ref endPoint );
+                            bytes = -1;
+                            do
+                                try
+                                {
+                                    bytes = socket.ReceiveFrom(data, 4, SocketFlags.None, ref endPoint);
+                                }
+                                catch (Exception ex) {
+                                    socket.SendTo(data, ByteRead, SocketFlags.None, remotePoint);
+
+                                }
+                            while (bytes == -1);
                             if (bytes == 4 )
                             {
                                 bytes = BitConverter.ToInt32(data, 0);
