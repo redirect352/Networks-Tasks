@@ -64,7 +64,7 @@ namespace WindowsFormsApp1
                 data = new byte[buffersize];
 
                 int ByteRead = 0, i =0, bytes;
-                socket.ReceiveTimeout = 5000;
+                socket.ReceiveTimeout = 3000;
                 EndPoint endPoint = null;
                 
                 do
