@@ -56,7 +56,7 @@ namespace WindowsFormsApp2
             try
             {
                 client.Connect(host, port);
-                MessageBox.Show("Подключено к серверу " + host);
+               // MessageBox.Show("Подключено к серверу " + host);
             }
             catch (Exception ex)
             {
@@ -66,11 +66,24 @@ namespace WindowsFormsApp2
 
             SslStream mainStream = new SslStream(client.GetStream());
 
+            //authPasswordForSmtpMailRu
+
+            mainStream.ReadTimeout = 10000;
+            mainStream.WriteTimeout = 10000;
+
+            try
+            {
+                mainStream.AuthenticateAsClient(host, null, System.Security.Authentication.SslProtocols.Tls, false);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+
+
             mainStream.ReadTimeout = 1000;
             mainStream.WriteTimeout = 1000;
-            //authPasswordForSmtpMailRu
-            mainStream.AuthenticateAsClient(host, null, System.Security.Authentication.SslProtocols.Tls, false);
-
             string My_IP = new WebClient().DownloadString("http://icanhazip.com/");
 
             string[] commands = { "EHLO "+My_IP,"AUTH LOGIN",Form1.Base64Encode(email),
