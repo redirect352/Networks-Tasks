@@ -65,6 +65,7 @@ namespace WindowsFormsApp2
             }
 
             SslStream mainStream = new SslStream(client.GetStream());
+           
 
             mainStream.ReadTimeout = 1000;
             mainStream.WriteTimeout = 1000;
@@ -117,6 +118,26 @@ namespace WindowsFormsApp2
         }
 
         private void EnterForm_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void UserPasswordBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void UserEmailBox_TextChanged(object sender, EventArgs e)
         {
 
         }

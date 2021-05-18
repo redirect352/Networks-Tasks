@@ -45,6 +45,7 @@
             this.UserEmailBox.Name = "UserEmailBox";
             this.UserEmailBox.Size = new System.Drawing.Size(161, 20);
             this.UserEmailBox.TabIndex = 0;
+            this.UserEmailBox.TextChanged += new System.EventHandler(this.UserEmailBox_TextChanged);
             // 
             // UserPasswordBox
             // 
@@ -53,6 +54,7 @@
             this.UserPasswordBox.PasswordChar = '*';
             this.UserPasswordBox.Size = new System.Drawing.Size(161, 20);
             this.UserPasswordBox.TabIndex = 1;
+            this.UserPasswordBox.TextChanged += new System.EventHandler(this.UserPasswordBox_TextChanged);
             // 
             // contextMenuStrip1
             // 
@@ -87,6 +89,7 @@
             this.label2.Size = new System.Drawing.Size(45, 13);
             this.label2.TabIndex = 5;
             this.label2.Text = "Пароль";
+            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // label3
             // 
@@ -95,6 +98,7 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(0, 13);
             this.label3.TabIndex = 6;
+            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // CancelButton
             // 
