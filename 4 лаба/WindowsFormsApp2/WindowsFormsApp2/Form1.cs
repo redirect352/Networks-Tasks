@@ -14,13 +14,14 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Net.Mail;
 using System.Net.Mime;
+using MimeKit;
 
 namespace WindowsFormsApp2
 {
     public partial class Form1 : Form
     {
-        int port = 465;
-        string host = "smtp.mail.ru";
+        int port = 993;
+        string host = "imap.mail.ru";
         bool EnteredInAccount = false;
         string UserEmail = "";
         string UserPassword = "";
@@ -51,9 +52,16 @@ namespace WindowsFormsApp2
         public Form1()
         {
             InitializeComponent();
-            Port = (int)numericUpDown1.Value;
-            Host = SmtpServerBox.Text;
 
+
+
+            /* string s = "* 722 EXISTS";
+            if (Regex.IsMatch(s, @"\* \d+ EXISTS"))
+            {
+                Match m = Regex.Match(s, @"\d+");
+                int k = int.Parse(m.Value);
+                MessageBox.Show(k.ToString());
+               */
         }
 
         public static bool OutputText(string s, ListBox lb) 
@@ -82,7 +90,7 @@ namespace WindowsFormsApp2
                 OutputText("Войдите в аккаунт для отправки сообщений", listBox1);
                 return;
             }*/
-
+            /*
             string RecEmail = EmailBox.Text;
             if (!IsValidEmail(RecEmail))
             {
@@ -113,7 +121,7 @@ namespace WindowsFormsApp2
                 return;
             }
 
-            
+            */
             TcpClient client = new TcpClient();
             try
             {
@@ -136,9 +144,19 @@ namespace WindowsFormsApp2
             //testmail898989@mail.ru
             //8aofts6M06dvKV7aiaBD
 
-            string[] commands = { "EHLO "+My_IP,"AUTH LOGIN",Base64Encode(UserEmail),Base64Encode(UserPassword),
-                                   "MAIL FROM:<testmail898989@mail.ru>","RCPT TO:<"+RecEmail+">", "DATA", "Subject:"+subject, content + CRLF+".",
-                                   "QUIT"};
+            string[] commands = { "A002 CAPABILITY" ,
+                "a001 LOGIN testmail898989@mail.ru 8aofts6M06dvKV7aiaBD",
+                "A142 SELECT INBOX",
+
+                "A654 FETCH 1 (BODY[])"
+                };
+
+            //"А004 LIST \"/\" *", 
+            //"A142 SELECT INBOX"
+            // "А005 EXAMINE INBOX"
+            //SEARCH
+
+
 
 
             for (int i =0; i < commands.Length; i++) {
@@ -153,13 +171,24 @@ namespace WindowsFormsApp2
                 }
                 
                 OutputText( ReadAnswer(mainStream),listBox1);
+                OutputText(ReadAnswer(mainStream), listBox1);
+                if (i == 3) {
+                    OutputText(ReadAnswer(mainStream), listBox1); ;
+                    OutputText(ReadAnswer(mainStream), listBox1);
+                    OutputText(ReadAnswer(mainStream), listBox1);
+                    OutputText(ReadAnswer(mainStream), listBox1);
+                    OutputText(ReadAnswer(mainStream), listBox1);
+                        }
             }
+
+            string s = (string)listBox1.Items[listBox1.Items.Count-2];
+            string[] sq = s.Split(new char[] { '\n'});
             mainStream.Close();
             client.Close();
             OutputText("Соединение разорвано " + host, listBox1);
 
         }
-
+        
 
         public static bool SendMessage(SslStream stream, string Message) 
         {
@@ -245,16 +274,9 @@ namespace WindowsFormsApp2
 
         public static int GetAnswerCode(string message) {
             int ret = -1;
-
-            try
-            {
-                message = message.Substring(0, 3);
-                ret = int.Parse(message);
-
-            }
-            catch { ret = -1; }
+            message = message.Substring(0,3);
+            ret = int.Parse(message);
             return ret;
-                
 
         }
 
@@ -266,21 +288,6 @@ namespace WindowsFormsApp2
                 UserEmail = ent.Login;
                 UserPassword = ent.Password;
             }
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void SmtpServerBox_TextChanged(object sender, EventArgs e)
-        {
-           Host = SmtpServerBox.Text;
-        }
-
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
-        {
-            Port = (int)numericUpDown1.Value;
         }
     }
 }

@@ -41,34 +41,31 @@
             // 
             // UserEmailBox
             // 
-            this.UserEmailBox.Location = new System.Drawing.Point(102, 65);
-            this.UserEmailBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.UserEmailBox.Location = new System.Drawing.Point(68, 42);
             this.UserEmailBox.Name = "UserEmailBox";
-            this.UserEmailBox.Size = new System.Drawing.Size(240, 26);
+            this.UserEmailBox.Size = new System.Drawing.Size(161, 20);
             this.UserEmailBox.TabIndex = 0;
-            this.UserEmailBox.Text = "testmail898989@mail.ru";
+            this.UserEmailBox.TextChanged += new System.EventHandler(this.UserEmailBox_TextChanged);
             // 
             // UserPasswordBox
             // 
-            this.UserPasswordBox.Location = new System.Drawing.Point(102, 131);
-            this.UserPasswordBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.UserPasswordBox.Location = new System.Drawing.Point(68, 85);
             this.UserPasswordBox.Name = "UserPasswordBox";
             this.UserPasswordBox.PasswordChar = '*';
-            this.UserPasswordBox.Size = new System.Drawing.Size(240, 26);
+            this.UserPasswordBox.Size = new System.Drawing.Size(161, 20);
             this.UserPasswordBox.TabIndex = 1;
+            this.UserPasswordBox.TextChanged += new System.EventHandler(this.UserPasswordBox_TextChanged);
             // 
             // contextMenuStrip1
             // 
-            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(108, 198);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button1.Location = new System.Drawing.Point(72, 129);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(90, 35);
+            this.button1.Size = new System.Drawing.Size(60, 23);
             this.button1.TabIndex = 3;
             this.button1.Text = "Войти";
             this.button1.UseVisualStyleBackColor = true;
@@ -77,10 +74,9 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(98, 40);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(65, 26);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(55, 20);
+            this.label1.Size = new System.Drawing.Size(38, 13);
             this.label1.TabIndex = 4;
             this.label1.Text = "Логин";
             this.label1.Click += new System.EventHandler(this.label1_Click);
@@ -88,28 +84,27 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(98, 106);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Location = new System.Drawing.Point(65, 69);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(67, 20);
+            this.label2.Size = new System.Drawing.Size(45, 13);
             this.label2.TabIndex = 5;
             this.label2.Text = "Пароль";
+            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(198, 182);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label3.Location = new System.Drawing.Point(132, 118);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(0, 20);
+            this.label3.Size = new System.Drawing.Size(0, 13);
             this.label3.TabIndex = 6;
+            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // CancelButton
             // 
-            this.CancelButton.Location = new System.Drawing.Point(249, 198);
-            this.CancelButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.CancelButton.Location = new System.Drawing.Point(166, 129);
             this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new System.Drawing.Size(94, 35);
+            this.CancelButton.Size = new System.Drawing.Size(63, 23);
             this.CancelButton.TabIndex = 7;
             this.CancelButton.Text = "Отмена";
             this.CancelButton.UseVisualStyleBackColor = true;
@@ -117,9 +112,9 @@
             // 
             // EnterForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(456, 268);
+            this.ClientSize = new System.Drawing.Size(304, 174);
             this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -127,7 +122,6 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.UserPasswordBox);
             this.Controls.Add(this.UserEmailBox);
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "EnterForm";
             this.Text = "EnterForm";
             this.Load += new System.EventHandler(this.EnterForm_Load);
