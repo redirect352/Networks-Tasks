@@ -685,7 +685,7 @@ namespace MailClasses
             {
                 const string CRLF = "\r\n";
 
-                byte[] messbytes = Encoding.UTF8.GetBytes(command);
+                byte[] messbytes = Encoding.UTF8.GetBytes(command + CRLF);
                 mainStream.Write(messbytes, 0, messbytes.Length);
                 return true;
             }
@@ -734,7 +734,17 @@ namespace MailClasses
         private void SaveLogs(string s)
         {
             //сохранение куда-то там...
-
+            FileStream f = new FileStream("d:/log.txt",FileMode.OpenOrCreate);  
+            try
+            {
+                f.Position = f.Length;
+                byte[] buf = Encoding.UTF8.GetBytes(s+"\n");
+                f.WriteAsync(buf,0,buf.Length);
+            
+            }
+            finally{
+                f.Close();
+            }
 
         }
 

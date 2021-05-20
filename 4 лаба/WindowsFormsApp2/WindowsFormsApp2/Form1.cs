@@ -289,5 +289,10 @@ namespace WindowsFormsApp2
                 UserPassword = ent.Password;
             }
         }
+
+        private void MainTextBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

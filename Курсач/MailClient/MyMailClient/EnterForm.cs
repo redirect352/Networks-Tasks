@@ -23,6 +23,7 @@ namespace MyMailClient
         public String Password { get; set; }
         public String Login { get; set; }
 
+        public ImapClient client = null;
 
 
         private void EnterButton_Click(object sender, EventArgs e)
@@ -58,6 +59,7 @@ namespace MyMailClient
             }
             Password = passw;
             Login = email;
+            client = im;
             this.DialogResult = DialogResult.OK;
             this.Close();
 

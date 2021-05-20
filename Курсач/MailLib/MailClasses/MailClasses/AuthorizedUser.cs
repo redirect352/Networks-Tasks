@@ -10,9 +10,16 @@ namespace MailClasses.User
     {
         public string login = "";
         public string passw = "";
+        public ImapClient imapClient;
         public AuthorizedUser(string log, string pas) {
             login = log;
             passw = pas;
+        }
+        public AuthorizedUser(string log, string pas, ImapClient im)
+        {
+            login = log;
+            passw = pas;
+            imapClient = im;
         }
     }
 }

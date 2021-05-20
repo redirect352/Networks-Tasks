@@ -89,6 +89,7 @@ namespace WindowsFormsApp2
             this.MainTextBox.Name = "MainTextBox";
             this.MainTextBox.Size = new System.Drawing.Size(648, 282);
             this.MainTextBox.TabIndex = 4;
+            this.MainTextBox.TextChanged += new System.EventHandler(this.MainTextBox_TextChanged);
             // 
             // label1
             // 
@@ -146,7 +147,6 @@ namespace WindowsFormsApp2
             this.SmtpServerBox.Size = new System.Drawing.Size(246, 26);
             this.SmtpServerBox.TabIndex = 10;
             this.SmtpServerBox.Text = "smtp.mail.ru";
-            this.SmtpServerBox.TextChanged += new System.EventHandler(this.SmtpServerBox_TextChanged);
             // 
             // label4
             // 
@@ -187,7 +187,6 @@ namespace WindowsFormsApp2
             0,
             0,
             0});
-            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // Form1
             // 
@@ -210,7 +209,6 @@ namespace WindowsFormsApp2
             this.Controls.Add(this.button1);
             this.Name = "Form1";
             this.Text = "Smtp-client";
-            this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
