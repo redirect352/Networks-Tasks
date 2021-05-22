@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2;
@@ -20,7 +21,8 @@ namespace MyMailClient
 
         public MainForm()
         {
-            InitializeComponent(); 
+            InitializeComponent();
+
             
         }
         //testmail898989@mail.ru
@@ -45,6 +47,7 @@ namespace MyMailClient
             try
             {
                 foreach (AuthorizedUser au in authorizedUsers) {
+                    au.imapClient.DisconnectFromServer();
                     string s = au.login + "|" + au.passw + "|";
                     byte[] buf = Encoding.UTF8.GetBytes(s);
                     F.WriteAsync(buf, 0, buf.Length);
@@ -122,6 +125,24 @@ namespace MyMailClient
                 //файла не существует, ну в другой раз))
             }
             
+        }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void AddMessage_Click(object sender, EventArgs e)
+        {
+            ImapClient im = authorizedUsers.First.Value.imapClient;
+            im.SelectBox("INBOX");
+            im.GetAllEmailsInBox("D:\\tmp","email",".txt");
+            
+        }
+
+        private void listView2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -27,6 +27,8 @@ namespace WindowsFormsApp2
         string UserPassword = "";
         const string CRLF = "\r\n";
 
+        SslStream mainStream = null;
+
         public string Host {
             get {
                 return host;
@@ -135,7 +137,7 @@ namespace WindowsFormsApp2
                 return;
             }
             
-            SslStream mainStream = new SslStream( client.GetStream());
+             mainStream = new SslStream( client.GetStream());
 
             mainStream.ReadTimeout = 1000;
             mainStream.WriteTimeout = 1000;
@@ -146,9 +148,7 @@ namespace WindowsFormsApp2
 
             string[] commands = { "A002 CAPABILITY" ,
                 "a001 LOGIN testmail898989@mail.ru 8aofts6M06dvKV7aiaBD",
-                "A142 SELECT INBOX",
-
-                "A654 FETCH 1 (BODY[])"
+                "A142 LIST \"/\" \"\""
                 };
 
             //"А004 LIST \"/\" *", 
@@ -183,9 +183,6 @@ namespace WindowsFormsApp2
 
             string s = (string)listBox1.Items[listBox1.Items.Count-2];
             string[] sq = s.Split(new char[] { '\n'});
-            mainStream.Close();
-            client.Close();
-            OutputText("Соединение разорвано " + host, listBox1);
 
         }
         
@@ -293,6 +290,28 @@ namespace WindowsFormsApp2
         private void MainTextBox_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            string command = SubjectBox.Text;
+
+
+
+                if (SendMessage(mainStream, command))
+                {
+                    OutputText(command, listBox1);
+                }
+                else
+                {
+                    OutputText("Error Sending: " + command, listBox1);
+                   
+                }
+
+                OutputText(ReadAnswer(mainStream), listBox1);
+                OutputText(ReadAnswer(mainStream), listBox1);
+
+           
         }
     }
 }
