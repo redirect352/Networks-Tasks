@@ -12,7 +12,7 @@ using System.IO;
 
 namespace MailClasses
 {
-
+    
 
     public class IncorrectLoginorPasswExeption : ImapExeption {
         public IncorrectLoginorPasswExeption(string message) : base(message)
@@ -37,8 +37,14 @@ namespace MailClasses
     public class ImapClient
     {
         const string CLRF = "\r\n";
-
-        List<InsideBox> boxes = new List<InsideBox>();
+        string mailFileExtension = ".txt";
+        // работа со вкладками
+        public List<InsideBox> boxes = new List<InsideBox>();
+        public int InboxNum = -1;
+        public int SpamNum = -1;
+        public int TrashNum = -1;
+        public int SendNum = -1;
+        public int DraftsNum = -1;
 
         private int num = 100;
         private char Symb = 'A';
@@ -85,6 +91,19 @@ namespace MailClasses
         // 
         
         private SslStream mainStream = null;
+
+
+        public int FindBox(string name) {
+            int res = -1,k=0;
+            foreach (InsideBox i in boxes)
+            { if (i.NameOnServer == name)
+                {
+                    res = k;
+                }
+                k++;
+            }
+            return res;
+        }
 
         //********************************************
         // Процедуры работы с почтой
@@ -135,13 +154,72 @@ namespace MailClasses
         }
 
         //Получение всех писем в почтовом ящике
-        public void GetAllEmailsInBox(string folderPath, string nameTemplate, string mailFileExtension) {
-            string filename = folderPath+"\\"+nameTemplate ;
+        public void GetAllEmailsInBox(string folderPath) {
+            string filename = folderPath+"\\" ;
             for (int i = 0; i< exists;i++) {
-                FetchCommand(i,"BODY[]",filename+"_"+i.ToString()+mailFileExtension);
+                FetchCommand(i,"BODY[]", filename+i.ToString()+mailFileExtension,"");
             
             }
 
+        }
+
+        public void GetNewEmailsInBox(int BoxNumber, List<int> AlreadyLoaded, string folderPath) {
+            try {
+                SelectBox(boxes.ElementAt(BoxNumber).ServerPath);
+            }
+            catch (Exception ex)
+            { SaveLogs("Select exeption\n\n");
+            }
+
+
+                List<int> AllEmailsInbox = new List<int>();
+                string[] Emails = SearchCommand(" ALL", " UID ");
+                foreach (string s in Emails)
+                {
+                    if (Regex.IsMatch(s, @"\* SEARCH"))
+                    {
+                        var M = Regex.Matches(s, @"\s(\d)+");
+                        foreach (Match match in M)
+                        {
+                            AllEmailsInbox.Add(int.Parse(match.Value));
+                        }
+                    
+                    }
+                }
+
+            if (AlreadyLoaded!=null) { 
+                for (int i =0;i < AllEmailsInbox.Count;i++) {
+                    int tmp = AllEmailsInbox.ElementAt(i);
+                    if (AlreadyLoaded.Contains(tmp))
+                    {
+                        AllEmailsInbox.RemoveAt(i);
+                    }
+                    else { 
+                        
+                       
+                        try
+                        {
+                            if (AlreadyLoaded.Max<int>() >= tmp)
+                            {
+                                string filepath = folderPath + "\\" + tmp.ToString() + mailFileExtension;
+                                File.Delete(filepath);
+                            }
+                        }
+                        catch(Exception ex)
+                        {
+                            if (!(ex is ArgumentNullException))
+                             SaveLogs(ex.Message);
+                        }
+                    }
+
+                }
+            }
+
+            foreach (int k in AllEmailsInbox)
+               {
+                    FetchCommand(k, "BODY[]", folderPath+"\\"+k.ToString() + mailFileExtension," UID ");
+              }
+            
         }
 
         public void LoadAllBoxes(string path) {
@@ -170,12 +248,29 @@ namespace MailClasses
                     }
 
                 }
+                int k = 0;
+                foreach (InsideBox b in boxes) {
+                    if (Regex.IsMatch(b.NameOnServer, "inbox", RegexOptions.IgnoreCase))
+                        InboxNum = k;
+                    if (Regex.IsMatch(b.NameOnServer, "spam", RegexOptions.IgnoreCase))
+                        SpamNum = k;
+                    if (Regex.IsMatch(b.NameOnServer, "sent", RegexOptions.IgnoreCase))
+                        SendNum = k;
+                    if (Regex.IsMatch(b.NameOnServer, "drafts", RegexOptions.IgnoreCase))
+                        DraftsNum = k;
+                    if (Regex.IsMatch(b.NameOnServer, "trash", RegexOptions.IgnoreCase))
+                        TrashNum = k;
+                    k++;
+                }
+
             }
             catch (ImapExeption IEx)
 
             { }
              
         }
+
+
 
         public void DisconnectFromServer()
         {
@@ -199,13 +294,45 @@ namespace MailClasses
             }  
         }
 
+        //
+        
+        public List<int> GetUnseenNums()
+        {
+            string[] answer = null;
+            try {
+                answer = SearchCommand(" UNSEEN", " UID ");
+
+
+            }
+            catch {
+                return null;
+            }
+            if (answer == null)
+                return null;
+            List<int> results = new List<int>();
+            foreach (string s in answer) {
+                if (Regex.IsMatch(s,@"^\* SEARCH")) {
+                   string[] tmp =  s.Substring(s.IndexOf("H")+1).Split(' ');
+                    int tr = 0;
+                    foreach (string k in tmp) {
+                        if (k!="" && int.TryParse(k,out tr) ) {
+                            results.Add(tr);
+                        }
+                   }
+                    
+                }
+            }
+            return results;
+        }
+
+    
         //********************************************
         // Команды 
 
         private int template()
         {
             string answCode = Symb + num.ToString();
-            string command = answCode + "Command name" + CLRF;
+            string command = answCode + "Command name";
             SaveLogs(command);
             num++;
             if (mainStream == null)
@@ -265,7 +392,7 @@ namespace MailClasses
         private int CapabilityCommand()
         {
             string answCode = Symb + num.ToString();
-            string command = answCode + " CAPABILITY" + CLRF;
+            string command = answCode + " CAPABILITY";
             SaveLogs(command);
             num++;
             if (mainStream == null)
@@ -317,7 +444,7 @@ namespace MailClasses
         private int NoopCommand()
         {
             string answCode = Symb + num.ToString();
-            string command = answCode + " NOOP" + CLRF;
+            string command = answCode + " NOOP" ;
             num++;
 
             SaveLogs(command);
@@ -372,7 +499,7 @@ namespace MailClasses
         private int LogOutCommand()
         {
             string answCode = Symb + num.ToString();
-            string command = answCode + " LOGOUT" + CLRF;
+            string command = answCode + " LOGOUT" ;
             num++;
 
             SaveLogs(command);
@@ -659,7 +786,7 @@ namespace MailClasses
         private int CloseCommand()
         {
             string answCode = Symb + num.ToString();
-            string command = answCode + "CLOSE" + CLRF;
+            string command = answCode + "CLOSE";
             SaveLogs(command);
             num++;
             if (mainStream == null)
@@ -718,10 +845,10 @@ namespace MailClasses
         }
 
 
-        private int FetchCommand(int MailNumber, string MailContent, string filename)
+        private int FetchCommand(int MailNumber, string MailContent, string filename, string USEUid)
         {
             string answCode = Symb + num.ToString();
-            string command = answCode + " FETCH " + MailNumber.ToString()+" "+MailContent;
+            string command = answCode + USEUid + " FETCH " + MailNumber.ToString()+" "+MailContent;
             SaveLogs(command);
             num++;
             if (mainStream == null)
@@ -750,10 +877,12 @@ namespace MailClasses
                             FileStream F = new FileStream(filename, FileMode.Create,FileAccess.Write);
                             try
                             {
+                                
                                 //доработать
                                 foreach (string s in strs)
                                 {
-                                    if (s.IndexOf(answCode + " OK FETCH ") < 0 && s.IndexOf("* " + MailNumber.ToString() + " FETCH ") < 0)
+                                    if (s.IndexOf(answCode + " OK FETCH ") < 0 && s.IndexOf("* " + MailNumber.ToString() + " FETCH ") < 0 && 
+                                        s.IndexOf("FETCH (UID ") < 0)
                                     {
                                         byte[] buf = Encoding.UTF8.GetBytes(s + "\n");
                                         
@@ -866,6 +995,67 @@ namespace MailClasses
 
         }
 
+
+
+        private string[] SearchCommand(string Args, string UseUID)
+        {
+            string answCode = Symb + num.ToString();
+            string command = answCode + UseUID+  " Search "+ Args;
+            SaveLogs(command);
+            num++;
+            if (mainStream == null)
+                throw new ImapExeption("Not connected to server");
+
+            bool res = SendMessageToServer(command);
+            if (!res)
+                throw new ImapExeption("Cannot send message to server");
+
+            try
+            {
+                res = false;
+                string answer;
+                do
+                {
+                    answer = GetAnswerFromServer(ref res);
+                    if (res)
+                    {
+                        SaveLogs(answer);
+                        if (answer.IndexOf(answCode + " OK") >= 0)
+                        {
+                            res = false;
+                            string[] tmp = answer.Split(new char[] {'\n', '\r' });
+                            return tmp;
+                        }
+                        // анализ информации...
+                        if (answer.IndexOf(answCode + " BAD ") >= 0)
+                        {
+                            throw new ImapExeption("Wrong command " + command);
+                        }
+                        if (answer.IndexOf(answCode + " NO ") >= 0)
+                        {
+                            throw new ImapExeption("No " + command);
+                        }
+
+
+                    }
+                }
+                while (res);
+
+            }
+            catch (ImapExeption iex)
+            {
+                SaveLogs(iex.Message);
+                throw iex;
+            }
+            catch (Exception ex)
+            {
+                SaveLogs(ex.Message);
+                return null;
+
+            }
+
+            return null;
+        }
         // конец команд
 
 

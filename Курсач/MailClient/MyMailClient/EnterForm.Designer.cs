@@ -82,13 +82,16 @@
             this.UserPasswordBox.PasswordChar = '*';
             this.UserPasswordBox.Size = new System.Drawing.Size(161, 20);
             this.UserPasswordBox.TabIndex = 9;
+            this.UserPasswordBox.Text = "8aofts6M06dvKV7aiaBD";
             // 
             // UserEmailBox
             // 
+            this.UserEmailBox.BackColor = System.Drawing.SystemColors.Window;
             this.UserEmailBox.Location = new System.Drawing.Point(58, 25);
             this.UserEmailBox.Name = "UserEmailBox";
             this.UserEmailBox.Size = new System.Drawing.Size(161, 20);
             this.UserEmailBox.TabIndex = 8;
+            this.UserEmailBox.Text = "testmail898989@mail.ru";
             // 
             // EnterForm
             // 
@@ -104,6 +107,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "EnterForm";
             this.Text = "Вход";
+            this.Load += new System.EventHandler(this.EnterForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

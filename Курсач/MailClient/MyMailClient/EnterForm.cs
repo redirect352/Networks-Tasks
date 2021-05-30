@@ -13,6 +13,7 @@ namespace MyMailClient
 {
     public partial class EnterForm : Form
     {
+        
         public EnterForm()
         {
             InitializeComponent();
@@ -63,6 +64,11 @@ namespace MyMailClient
             this.DialogResult = DialogResult.OK;
             this.Close();
 
+
+        }
+
+        private void EnterForm_Load(object sender, EventArgs e)
+        {
 
         }
     }

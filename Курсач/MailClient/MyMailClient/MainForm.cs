@@ -11,19 +11,37 @@ using System.Windows.Forms;
 using Microsoft.Web.WebView2;
 using MailClasses;
 using MailClasses.User;
+using MailClasses.MimeWork;
 using System.IO;
 
 namespace MyMailClient
 {
     public partial class MainForm : Form
     {
-        LinkedList<AuthorizedUser> authorizedUsers = new LinkedList<MailClasses.User.AuthorizedUser> { };
 
+
+
+        const string mailFolder = "mail";
+        mailFolderInfo mailFolderInfo = null;
+        int selectedmail = -1;
+
+        LinkedList<AuthorizedUser> authorizedUsers = new LinkedList<MailClasses.User.AuthorizedUser> { };
+        AuthorizedUser currentUser = null;
         public MainForm()
         {
             InitializeComponent();
-
+            FilesWork.CheckAllNeededFoldersExists("");
             
+            DateTime time = new DateTime();
+            MimeDecrypter.DecryptMessage("mail\\testmail898989-mails\\Inbox\\15.txt",webBrowser1, listView3);
+            MimeDecrypter.GetSubjectAndDate("mail\\testmail898989-mails\\Inbox\\15.txt",ref time);
+            MimeDecrypter.SetHeaders("mail\\testmail898989-mails\\Inbox\\15.txt", SubjectLabel, label3, label1,  label2);
+            
+            List<int> und = new List<int>();
+            und.Add(1);
+            und.Add(2);
+            und.Add(3);
+            FilesWork.ShowEmailsInFolder("mail\\testmail898989-mails\\Inbox",listView2,ref mailFolderInfo,und);
         }
         //testmail898989@mail.ru
         //8aofts6M06dvKV7aiaBD
@@ -33,16 +51,21 @@ namespace MyMailClient
             if (ent.ShowDialog() == DialogResult.OK)
             {
                 usersBox.Items.Add(ent.Login);
-                authorizedUsers.AddLast( new AuthorizedUser(ent.Login, ent.Password,ent.client));
+                authorizedUsers.AddLast(new AuthorizedUser(ent.Login, ent.Password, ent.client));
+                currentUser = authorizedUsers.Last.Value;
                 usersBox.SelectedIndex = usersBox.Items.Count - 1;
                 usersBox.Enabled = true;
-            }
+                currentUser.imapClient.LoadAllBoxes("\"/\"");
+                FilesWork.CheckAllNeededFoldersExists(ent.Login.Substring(0, ent.Login.IndexOf("@")));
+                SetNamesToListWiev();
 
+
+            }
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            FileStream F = new FileStream("users.dat", FileMode.Create,FileAccess.Write);
+            FileStream F = new FileStream("users.dat", FileMode.Create, FileAccess.Write);
 
             try
             {
@@ -54,7 +77,7 @@ namespace MyMailClient
                     //Закрыть все соединения
                 }
             }
-            finally 
+            finally
             {
                 F.Close();
             }
@@ -62,9 +85,6 @@ namespace MyMailClient
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-          
-            listView1.Items[0].Selected = true;
-
 
             try {
                 FileStream F = new FileStream("users.dat", FileMode.Open, FileAccess.Read);
@@ -72,46 +92,51 @@ namespace MyMailClient
                 try
                 {
                     byte[] buf = new byte[4048];
-                    int byteRead = F.Read(buf, 0 ,4048);
-                    string[] s = (Encoding.UTF8.GetString(buf,0, byteRead)).Split(new char[] {'|' });
-                  
+                    int byteRead = F.Read(buf, 0, 4048);
+                    string[] s = (Encoding.UTF8.GetString(buf, 0, byteRead)).Split(new char[] { '|' });
+
                     if (s.Length < 2)
                         return;
-                    for (int i = 0; i < s.Length-1; i += 2) 
+                    for (int i = 0; i < s.Length - 1; i += 2)
                     {
                         //MessageBox.Show(s[i] + " " +s[i+1]);
-                        
+
                         ImapClient im = new ImapClient();
                         im.ImapServerName = "imap.mail.ru";
                         im.port = 993;
                         im.UserLogin = s[i];
-                        im.UserPassword = s[i+1];
+                        im.UserPassword = s[i + 1];
                         im.ConnectToServer();
 
                         try
                         {
                             im.AuthOnServer();
-                            authorizedUsers.AddLast(new AuthorizedUser(s[i],s[i+1],im));
+                            authorizedUsers.AddLast(new AuthorizedUser(s[i], s[i + 1], im));
                             usersBox.Items.Add(s[i]);
                             if (!usersBox.Enabled)
                             {
                                 usersBox.Enabled = true;
                                 usersBox.SelectedIndex = usersBox.Items.Count - 1;
                             }
+                            //Загрузка ящиков
+                            currentUser.imapClient.LoadAllBoxes("\"/\"");
+                            SetNamesToListWiev();
+
                         }
                         catch (IncorrectLoginorPasswExeption ex)
                         {
-                            MessageBox.Show("Неверный пароль аккаунта " + s[i]+ ". Возможно вы поменяли пароль.Авторизуйтесь снова");
+                            MessageBox.Show("Неверный пароль аккаунта " + s[i] + ". Возможно вы поменяли пароль.Авторизуйтесь снова");
                             return;
                         }
                         catch
                         {
-                            MessageBox.Show("Ошибка входа в аккаунт "+ s[i]);
+                            MessageBox.Show("Ошибка входа в аккаунт " + s[i]);
                             return;
                         }
 
                     }
-
+                    try { currentUser = authorizedUsers.Last.Value; }
+                    catch { }
 
 
                 }
@@ -121,26 +146,138 @@ namespace MyMailClient
                 }
 
             }
-            catch(FileNotFoundException F) {
+            catch (FileNotFoundException F) {
                 //файла не существует, ну в другой раз))
             }
-            
+
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            
+            if (currentUser == null)
+                return;
+            string AccountName = currentUser.login.Substring(0, currentUser.login.IndexOf("@"));
+            FilesWork.CheckAllNeededFoldersExists(AccountName);
 
+            var selItem = listView1.SelectedItems;
+            if (selItem.Count <= 0)
+                return;
+            mailFolderInfo = new mailFolderInfo();
+
+            string foldPath = "mail\\" + AccountName + "-mails\\" + selItem[0].Text;
+            mailFolderInfo.path = foldPath;
+
+            int BoxNum = currentUser.imapClient.FindBox(selItem[0].Text) ;
+
+            // здесб
+            if (BoxNum >= 0)
+            {
+                //currentUser.imapClient.GetNewEmailsInBox(BoxNum, FilesWork.GetAllLoadedEmailsInForder(foldPath), foldPath);
+                mailFolderInfo.number = BoxNum;
+            }
+            
+            //FilesWork.ShowEmailsInFolder("mail\\" + AccountName + "-mails\\" + selItem[0].Text,listView2,ref mailFolderInfo);       
+            FilesWork.ShowEmailsInFolder(mailFolderInfo.path, listView2, ref mailFolderInfo, new List<int>());
         }
 
         private void AddMessage_Click(object sender, EventArgs e)
         {
-            ImapClient im = authorizedUsers.First.Value.imapClient;
-            im.SelectBox("INBOX");
-            im.GetAllEmailsInBox("D:\\tmp","email",".txt");
             
+
         }
 
         private void listView2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (mailFolderInfo == null)
+                return;
+            var selItem = listView2.SelectedItems;
+            if (selItem.Count <= 0)
+                return;
+            var item = selItem[0];
+            int id= mailFolderInfo.GetUidByIndex(item.Text);
+            selectedmail = id;
+            if (id >=0 ) {
+                string path = mailFolderInfo.path + "\\" + (id).ToString() + ".txt";
+                MimeDecrypter.DecryptMessage(path, webBrowser1, listView3);
+                MimeDecrypter.SetHeaders(path, SubjectLabel, label3, label1, label2);
+            }        
+        }
+
+        //---------------------------
+        private void SetNamesToListWiev()
+        {
+            if (currentUser == null)
+                return;
+            ImapClient imap = currentUser.imapClient;
+            if (imap.InboxNum >= 0)
+            {
+                ListViewItem l = new ListViewItem("Inbox");
+                l.Group = listView1.Groups[0];
+                listView1.Items.Add(l);
+               
+            }
+
+               
+            if (imap.SendNum >= 0)
+            {
+                ListViewItem l = new ListViewItem("Sent");
+                l.Group = listView1.Groups[0];
+                listView1.Items.Add(l);
+            }
+
+            if (imap.SpamNum >= 0)
+            {
+                ListViewItem l = new ListViewItem("Spam");
+                l.Group = listView1.Groups[0];
+                listView1.Items.Add(l);
+            }
+
+            if (imap.TrashNum>= 0)
+            {
+                ListViewItem l = new ListViewItem("Trash");
+                l.Group = listView1.Groups[0];
+                listView1.Items.Add(l);
+            }
+
+
+
+
+
+
+        }
+
+        private void webView21_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void mailtopsBox_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void listView3_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (mailFolderInfo == null) {
+                return;
+            }
+            var selItem = listView3.SelectedItems;
+            if (selItem.Count <= 0)
+                return;
+            var item = selItem[0];
+
+            string path =mailFolderInfo.path+"\\"+selectedmail.ToString()+ "_attachments"+"\\"+ item.Text;
+            try
+            {
+                System.Diagnostics.Process.Start(path);
+            }
+            catch {
+                MessageBox.Show("Невозможно отрыть файл стандарными сре");
+            }
+        }
+
+        private void label3_Click(object sender, EventArgs e)
         {
 
         }

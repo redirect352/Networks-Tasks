@@ -11,10 +11,11 @@ namespace MailClasses
         public string ServerPath;
         public string NameOnServer;//
         public string NameForClient;
-        public InsideBox(string name, string path) {
+        public InsideBox(string name, string path)
+        {
 
             ServerPath = path;
-            NameOnServer  = name;
+            NameOnServer = name;
         }
     }
 }
