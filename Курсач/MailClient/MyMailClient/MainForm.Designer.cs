@@ -31,7 +31,6 @@
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Основные", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("Дополнительные", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("wefewefw");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.UserAccountData = new System.Windows.Forms.GroupBox();
             this.listView1 = new System.Windows.Forms.ListView();
@@ -49,9 +48,15 @@
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.label4 = new System.Windows.Forms.Label();
             this.MessageContentBox = new System.Windows.Forms.GroupBox();
+            this.MessagesListVievContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.поместитьВСпамToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.удалитьСообщениеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.поместитьВКорзинуToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.удалитьБезвозвратноToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.UserAccountData.SuspendLayout();
             this.mailtopsBox.SuspendLayout();
             this.MessageContentBox.SuspendLayout();
+            this.MessagesListVievContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // UserAccountData
@@ -83,7 +88,7 @@
             listViewGroup4});
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(4, 154);
-            this.listView1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.listView1.Margin = new System.Windows.Forms.Padding(2);
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(157, 400);
@@ -144,11 +149,10 @@
             // listView2
             // 
             this.listView2.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.listView2.ContextMenuStrip = this.MessagesListVievContextMenu;
             this.listView2.Font = new System.Drawing.Font("Calibri", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.listView2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.listView2.ForeColor = System.Drawing.Color.Black;
             this.listView2.HideSelection = false;
-            this.listView2.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem2});
             this.listView2.Location = new System.Drawing.Point(0, 25);
             this.listView2.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.listView2.Name = "listView2";
@@ -197,9 +201,8 @@
             this.label3.Location = new System.Drawing.Point(22, 89);
             this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(81, 19);
+            this.label3.Size = new System.Drawing.Size(0, 19);
             this.label3.TabIndex = 6;
-            this.label3.Text = "27.22.2123";
             this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // SubjectLabel
@@ -209,9 +212,8 @@
             this.SubjectLabel.Location = new System.Drawing.Point(5, 17);
             this.SubjectLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.SubjectLabel.Name = "SubjectLabel";
-            this.SubjectLabel.Size = new System.Drawing.Size(166, 26);
+            this.SubjectLabel.Size = new System.Drawing.Size(0, 26);
             this.SubjectLabel.TabIndex = 7;
-            this.SubjectLabel.Text = "Тема Сообщения";
             // 
             // listView3
             // 
@@ -326,6 +328,44 @@
             this.MessageContentBox.TabIndex = 9;
             this.MessageContentBox.TabStop = false;
             // 
+            // MessagesListVievContextMenu
+            // 
+            this.MessagesListVievContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.поместитьВСпамToolStripMenuItem,
+            this.удалитьСообщениеToolStripMenuItem});
+            this.MessagesListVievContextMenu.Name = "MessagesListVievContextMenu";
+            this.MessagesListVievContextMenu.Size = new System.Drawing.Size(186, 70);
+            // 
+            // поместитьВСпамToolStripMenuItem
+            // 
+            this.поместитьВСпамToolStripMenuItem.Name = "поместитьВСпамToolStripMenuItem";
+            this.поместитьВСпамToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.поместитьВСпамToolStripMenuItem.Text = "Поместить в спам";
+            this.поместитьВСпамToolStripMenuItem.Click += new System.EventHandler(this.поместитьВСпамToolStripMenuItem_Click);
+            // 
+            // удалитьСообщениеToolStripMenuItem
+            // 
+            this.удалитьСообщениеToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.поместитьВКорзинуToolStripMenuItem,
+            this.удалитьБезвозвратноToolStripMenuItem});
+            this.удалитьСообщениеToolStripMenuItem.Name = "удалитьСообщениеToolStripMenuItem";
+            this.удалитьСообщениеToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.удалитьСообщениеToolStripMenuItem.Text = "Удалить сообщение";
+            // 
+            // поместитьВКорзинуToolStripMenuItem
+            // 
+            this.поместитьВКорзинуToolStripMenuItem.Name = "поместитьВКорзинуToolStripMenuItem";
+            this.поместитьВКорзинуToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.поместитьВКорзинуToolStripMenuItem.Text = "Поместить в корзину";
+            this.поместитьВКорзинуToolStripMenuItem.Click += new System.EventHandler(this.поместитьВКорзинуToolStripMenuItem_Click);
+            // 
+            // удалитьБезвозвратноToolStripMenuItem
+            // 
+            this.удалитьБезвозвратноToolStripMenuItem.Name = "удалитьБезвозвратноToolStripMenuItem";
+            this.удалитьБезвозвратноToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.удалитьБезвозвратноToolStripMenuItem.Text = "Удалить безвозвратно";
+            this.удалитьБезвозвратноToolStripMenuItem.Click += new System.EventHandler(this.удалитьБезвозвратноToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(5F, 13F);
@@ -345,6 +385,7 @@
             this.mailtopsBox.ResumeLayout(false);
             this.MessageContentBox.ResumeLayout(false);
             this.MessageContentBox.PerformLayout();
+            this.MessagesListVievContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -367,6 +408,11 @@
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.GroupBox MessageContentBox;
+        private System.Windows.Forms.ContextMenuStrip MessagesListVievContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem поместитьВСпамToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem удалитьСообщениеToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem поместитьВКорзинуToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem удалитьБезвозвратноToolStripMenuItem;
     }
 }
 

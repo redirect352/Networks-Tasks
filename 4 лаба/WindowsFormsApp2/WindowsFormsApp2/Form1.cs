@@ -141,10 +141,8 @@ namespace WindowsFormsApp2
 
             mainStream.ReadTimeout = 1000;
             mainStream.WriteTimeout = 1000;
-            //authPasswordForSmtpMailRu
+
             mainStream.AuthenticateAsClient(host, null, System.Security.Authentication.SslProtocols.Tls,false) ;
-            //testmail898989@mail.ru
-            //8aofts6M06dvKV7aiaBD
 
             string[] commands = { "A002 CAPABILITY" ,
                 "a001 LOGIN testmail898989@mail.ru 8aofts6M06dvKV7aiaBD",

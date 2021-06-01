@@ -132,6 +132,32 @@ namespace MailClasses
             mainStream.AuthenticateAsClient(ImapServerName, null, System.Security.Authentication.SslProtocols.Tls, false);
         }
 
+        public void ChangeFolder(int SourceBoxNumber, int DestinationBoxNumber,int MessageUID) {
+            try
+            {
+                SelectBox(boxes.ElementAt(SourceBoxNumber).ServerPath);
+            }
+            catch (Exception ex)
+            {
+                SaveLogs("Select exeption\n\n");
+            }
+
+            int l= CopyCommand(MessageUID,boxes.ElementAt(DestinationBoxNumber).ServerPath,"UID");
+            if (l == 0)
+            {
+                l = StoreCommand(MessageUID, "+FLAGS.SILENT (\\Deleted)", "UID");
+                if (l == 0)
+                    EXPUNGECommand();
+                else
+                { throw new ImapExeption("Cannot delete"); }
+
+            }
+            else {
+                throw new ImapExeption("Cannot copy");
+            }
+
+        }
+
         //Вход в аккаунт
         public void AuthOnServer() {
 
@@ -163,7 +189,7 @@ namespace MailClasses
 
         }
 
-        public void GetNewEmailsInBox(int BoxNumber, List<int> AlreadyLoaded, string folderPath) {
+        public List<int> GetNewEmailsInBox(int BoxNumber, List<int> AlreadyLoaded, string folderPath) {
             try {
                 SelectBox(boxes.ElementAt(BoxNumber).ServerPath);
             }
@@ -171,8 +197,16 @@ namespace MailClasses
             { SaveLogs("Select exeption\n\n");
             }
 
+            List <int> unseen  =  new List<int>();
+            try {
+                unseen = GetUnseenNums();
+            }
+           
+            catch {
+                SaveLogs("Cannot unseen\n\n");
+            }
 
-                List<int> AllEmailsInbox = new List<int>();
+            List<int> AllEmailsInbox = new List<int>();
                 string[] Emails = SearchCommand(" ALL", " UID ");
                 foreach (string s in Emails)
                 {
@@ -187,39 +221,53 @@ namespace MailClasses
                     }
                 }
 
-            if (AlreadyLoaded!=null) { 
-                for (int i =0;i < AllEmailsInbox.Count;i++) {
-                    int tmp = AllEmailsInbox.ElementAt(i);
-                    if (AlreadyLoaded.Contains(tmp))
+            if (AlreadyLoaded != null)
+                foreach (int index in AlreadyLoaded) {
+                if (!AllEmailsInbox.Contains(index)) {
+                    try
                     {
-                        AllEmailsInbox.RemoveAt(i);
-                    }
-                    else { 
-                        
-                       
-                        try
+                        if (AlreadyLoaded.Max<int>() >= index)
                         {
-                            if (AlreadyLoaded.Max<int>() >= tmp)
-                            {
-                                string filepath = folderPath + "\\" + tmp.ToString() + mailFileExtension;
-                                File.Delete(filepath);
-                            }
-                        }
-                        catch(Exception ex)
-                        {
-                            if (!(ex is ArgumentNullException))
-                             SaveLogs(ex.Message);
+                            string filepath = folderPath + "\\" + index.ToString() + mailFileExtension;
+                            File.Delete(filepath);
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        if (!(ex is ArgumentNullException))
+                            SaveLogs(ex.Message);
+                    }
+                }
+                }
+            List<int> NeedToLoad = new List<int>();
+            if (AlreadyLoaded != null)
+            {
+                for (int i = 0; i < AllEmailsInbox.Count; i++)
+                {
+                    int tmp = AllEmailsInbox.ElementAt(i);
+                    if (!AlreadyLoaded.Contains(tmp))
+                    {
+                        NeedToLoad.Add(tmp);
+                    }
+
+
+
+
+
+
 
                 }
             }
+            else
+                NeedToLoad = AllEmailsInbox;
 
-            foreach (int k in AllEmailsInbox)
+            foreach (int k in NeedToLoad)
                {
                     FetchCommand(k, "BODY[]", folderPath+"\\"+k.ToString() + mailFileExtension," UID ");
               }
-            
+
+            return unseen;
+
         }
 
         public void LoadAllBoxes(string path) {
@@ -298,6 +346,7 @@ namespace MailClasses
         
         public List<int> GetUnseenNums()
         {
+            List<int> results = new List<int>();
             string[] answer = null;
             try {
                 answer = SearchCommand(" UNSEEN", " UID ");
@@ -305,13 +354,13 @@ namespace MailClasses
 
             }
             catch {
-                return null;
+                return results;
             }
             if (answer == null)
-                return null;
-            List<int> results = new List<int>();
+                return results;
+
             foreach (string s in answer) {
-                if (Regex.IsMatch(s,@"^\* SEARCH")) {
+                if (Regex.IsMatch(s,@"\* SEARCH")) {
                    string[] tmp =  s.Substring(s.IndexOf("H")+1).Split(' ');
                     int tr = 0;
                     foreach (string k in tmp) {
@@ -1056,8 +1105,184 @@ namespace MailClasses
 
             return null;
         }
-        // конец команд
+        
 
+
+
+        private int CopyCommand(int MailNumber, string DestinationBoxName, string USEUid)
+        {
+            string answCode = Symb + num.ToString();
+            string command = answCode+" " + USEUid + " COPY " + MailNumber.ToString() + " " + DestinationBoxName;
+            SaveLogs(command);
+            num++;
+            if (mainStream == null)
+                throw new ImapExeption("Not connected to server");
+
+            bool res = SendMessageToServer(command);
+            if (!res)
+                throw new ImapExeption("Cannot send message to server");
+
+            try
+            {
+                res = false;
+                string answer = "";
+                do
+                {
+                    answer = answer + GetAnswerFromServer(ref res);
+                    if (res)
+                    {
+                        SaveLogs(answer);
+                        if (answer.IndexOf(answCode + " OK ") >= 0)
+                        {
+                            return 0;
+                        }
+                        // анализ информации...
+                        if (answer.IndexOf(answCode + " BAD ") >= 0)
+                        {
+                            throw new ImapExeption("Wrong command " + command);
+                        }
+                        if (answer.IndexOf(answCode + " NO ") >= 0)
+                        {
+                            throw new ImapExeption("Cannot copy message " + command);
+                        }
+
+
+                    }
+                }
+                while (res);
+
+            }
+            catch (ImapExeption iex)
+            {
+                SaveLogs(iex.Message);
+                throw iex;
+            }
+            catch (Exception ex)
+            {
+                SaveLogs(ex.Message);
+                return 1;
+
+            }
+            return 0;
+
+
+        }
+
+        private int StoreCommand(int MailNumber, string Content, string USEUid)
+        {
+            string answCode = Symb + num.ToString();
+            string command = answCode + " " + USEUid + " STORE " + MailNumber.ToString() + " " + Content;
+            SaveLogs(command);
+            num++;
+            if (mainStream == null)
+                throw new ImapExeption("Not connected to server");
+
+            bool res = SendMessageToServer(command);
+            if (!res)
+                throw new ImapExeption("Cannot send message to server");
+
+            try
+            {
+                res = false;
+                string answer = "";
+                do
+                {
+                    answer = answer + GetAnswerFromServer(ref res);
+                    if (res)
+                    {
+                        SaveLogs(answer);
+                        if (answer.IndexOf(answCode + " OK ") >= 0)
+                        {
+                            return 0;
+                        }
+                        // анализ информации...
+                        if (answer.IndexOf(answCode + " BAD ") >= 0)
+                        {
+                            throw new ImapExeption("Wrong command " + command);
+                        }
+                        if (answer.IndexOf(answCode + " NO ") >= 0)
+                        {
+                            throw new ImapExeption("Cannot  change flags message " + command);
+                        }
+
+
+                    }
+                }
+                while (res);
+
+            }
+            catch (ImapExeption iex)
+            {
+                SaveLogs(iex.Message);
+                throw iex;
+            }
+            catch (Exception ex)
+            {
+                SaveLogs(ex.Message);
+                return 1;
+
+            }
+            return 0;
+
+
+        }
+
+        private int EXPUNGECommand()
+        {
+            string answCode = Symb + num.ToString();
+            string command = answCode + " EXPUNGE";
+            num++;
+
+            SaveLogs(command);
+
+            if (mainStream == null)
+                throw new ImapExeption("Not connected to server");
+
+            bool res = SendMessageToServer(command);
+            if (!res)
+                throw new ImapExeption("Cannot send message to server");
+
+            try
+            {
+                res = false;
+                string answer;
+                do
+                {
+                    answer = GetAnswerFromServer(ref res);
+                    if (res)
+                    {
+                        SaveLogs(answer);
+                        if (answer.IndexOf(answCode + " OK EXPUNGE") >= 0)
+                        {
+                            res = false;
+                        }
+                        // анализ информации...
+                        if (answer.IndexOf(answCode + " BAD ") >= 0 || answer.IndexOf(answCode + " no ") >= 0)
+                        {
+                            throw new ImapExeption("Wrong command " + command);
+                        }
+
+                    }
+                }
+                while (res);
+
+            }
+            catch (ImapExeption iex)
+            {
+                SaveLogs(iex.Message);
+                throw iex;
+            }
+            catch (Exception ex)
+            {
+                SaveLogs(ex.Message);
+                return 1;
+
+            }
+            return 0;
+        }
+
+
+        // конец команд
 
 
 

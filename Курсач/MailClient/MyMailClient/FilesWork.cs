@@ -120,8 +120,8 @@ namespace MyMailClient
                 }
                 int MessageUid = FilesWork.GetFileNumb(info.FullName);
                 if (UNSEEN.Contains(MessageUid)) {
-                    tmp.ForeColor = System.Drawing.Color.Black;
-                    
+                    tmp.ForeColor = System.Drawing.Color.DarkBlue;
+                                      
                 }
 
                 lv.Items.Add(tmp);

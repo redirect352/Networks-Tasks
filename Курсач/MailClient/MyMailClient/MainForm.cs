@@ -20,6 +20,7 @@ namespace MyMailClient
     {
 
 
+        List<int> LastUNSEEN = new List<int>();
 
         const string mailFolder = "mail";
         mailFolderInfo mailFolderInfo = null;
@@ -31,17 +32,17 @@ namespace MyMailClient
         {
             InitializeComponent();
             FilesWork.CheckAllNeededFoldersExists("");
-            
+            /*
             DateTime time = new DateTime();
             MimeDecrypter.DecryptMessage("mail\\testmail898989-mails\\Inbox\\15.txt",webBrowser1, listView3);
             MimeDecrypter.GetSubjectAndDate("mail\\testmail898989-mails\\Inbox\\15.txt",ref time);
             MimeDecrypter.SetHeaders("mail\\testmail898989-mails\\Inbox\\15.txt", SubjectLabel, label3, label1,  label2);
-            
+         
             List<int> und = new List<int>();
             und.Add(1);
             und.Add(2);
             und.Add(3);
-            FilesWork.ShowEmailsInFolder("mail\\testmail898989-mails\\Inbox",listView2,ref mailFolderInfo,und);
+            FilesWork.ShowEmailsInFolder("mail\\testmail898989-mails\\Inbox",listView2,ref mailFolderInfo,und);    */
         }
         //testmail898989@mail.ru
         //8aofts6M06dvKV7aiaBD
@@ -173,12 +174,15 @@ namespace MyMailClient
             // здесб
             if (BoxNum >= 0)
             {
-                //currentUser.imapClient.GetNewEmailsInBox(BoxNum, FilesWork.GetAllLoadedEmailsInForder(foldPath), foldPath);
+
+                LastUNSEEN = currentUser.imapClient.GetNewEmailsInBox(BoxNum, FilesWork.GetAllLoadedEmailsInForder(foldPath), foldPath);
                 mailFolderInfo.number = BoxNum;
+    
+
             }
             
             //FilesWork.ShowEmailsInFolder("mail\\" + AccountName + "-mails\\" + selItem[0].Text,listView2,ref mailFolderInfo);       
-            FilesWork.ShowEmailsInFolder(mailFolderInfo.path, listView2, ref mailFolderInfo, new List<int>());
+            FilesWork.ShowEmailsInFolder(mailFolderInfo.path, listView2, ref mailFolderInfo, LastUNSEEN);
         }
 
         private void AddMessage_Click(object sender, EventArgs e)
@@ -191,11 +195,22 @@ namespace MyMailClient
         {
             if (mailFolderInfo == null)
                 return;
+
+
             var selItem = listView2.SelectedItems;
             if (selItem.Count <= 0)
                 return;
+     
             var item = selItem[0];
-            int id= mailFolderInfo.GetUidByIndex(item.Text);
+            int id = mailFolderInfo.GetUidByIndex(item.Text);
+            if (item.ForeColor == Color.DarkBlue) {
+                item.ForeColor = Color.Black;
+                int l = LastUNSEEN.IndexOf(id);
+                if (l >= 0)
+                    LastUNSEEN.RemoveAt(l);
+            }
+
+           
             selectedmail = id;
             if (id >=0 ) {
                 string path = mailFolderInfo.path + "\\" + (id).ToString() + ".txt";
@@ -281,5 +296,90 @@ namespace MyMailClient
         {
 
         }
+
+        private void поместитьВСпамToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+
+            var selItem = listView2.SelectedItems;
+            if (selItem.Count <= 0)
+                return;
+            var item = selItem[0];
+            try {
+                int id = mailFolderInfo.GetUidByIndex(item.Text);
+                selectedmail = id;
+                if (id >= 0)
+                {
+                    string path = mailFolderInfo.path + "\\" + (id).ToString() + ".txt";
+                    int BoxNum = currentUser.imapClient.FindBox("Spam");
+                    try
+                    {
+                        string AccountName = currentUser.login.Substring(0, currentUser.login.IndexOf("@"));
+                        string foldPath = "mail\\" + AccountName + "-mails\\" +"Spam" ;
+                        if (mailFolderInfo.number != BoxNum)
+                        {
+                            currentUser.imapClient.ChangeFolder(mailFolderInfo.number, BoxNum, id);
+                            File.Copy(path, foldPath + "\\" + (id).ToString() + ".txt");
+                            File.Delete(path);
+
+                            FilesWork.ShowEmailsInFolder(mailFolderInfo.path, listView2, ref mailFolderInfo, LastUNSEEN);
+                        }
+                    }
+                    catch {
+                        MessageBox.Show("Ошибка, попробуйте снова");
+
+                    }
+                }
+
+                }
+            catch { }
+
+        }
+
+        private void поместитьВКорзинуToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var selItem = listView2.SelectedItems;
+            if (selItem.Count <= 0)
+                return;
+            var item = selItem[0];
+            try
+            {
+                int id = mailFolderInfo.GetUidByIndex(item.Text);
+                selectedmail = id;
+                if (id >= 0)
+                {
+                    string path = mailFolderInfo.path + "\\" + (id).ToString() + ".txt";
+                    int BoxNum = currentUser.imapClient.FindBox("Trash");
+                    try
+                    {
+                        string AccountName = currentUser.login.Substring(0, currentUser.login.IndexOf("@"));
+                        string foldPath = "mail\\" + AccountName + "-mails\\" + "Trash";
+                        if (mailFolderInfo.number != BoxNum)
+                        {
+                            currentUser.imapClient.ChangeFolder(mailFolderInfo.number, BoxNum, id);
+                            File.Copy(path, foldPath + "\\" + (id).ToString() + ".txt");
+                            File.Delete(path);
+
+                            FilesWork.ShowEmailsInFolder(mailFolderInfo.path, listView2, ref mailFolderInfo, LastUNSEEN);
+                        }
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Ошибка, попробуйте снова");
+
+                    }
+                }
+
+            }
+            catch { }
+        }
+
+        private void удалитьБезвозвратноToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+
     }
 }
