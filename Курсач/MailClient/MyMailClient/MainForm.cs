@@ -13,6 +13,7 @@ using MailClasses;
 using MailClasses.User;
 using MailClasses.MimeWork;
 using System.IO;
+using System.Net.Mail;
 
 namespace MyMailClient
 {
@@ -32,6 +33,8 @@ namespace MyMailClient
         {
             InitializeComponent();
             FilesWork.CheckAllNeededFoldersExists("");
+            MessageContentBox.Visible = true;
+            groupBox1.Visible = false;
             /*
             DateTime time = new DateTime();
             MimeDecrypter.DecryptMessage("mail\\testmail898989-mails\\Inbox\\15.txt",webBrowser1, listView3);
@@ -66,7 +69,7 @@ namespace MyMailClient
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            FileStream F = new FileStream("users.dat", FileMode.Create, FileAccess.Write);
+            /*FileStream F = new FileStream("users.dat", FileMode.Create, FileAccess.Write);
 
             try
             {
@@ -81,7 +84,7 @@ namespace MyMailClient
             finally
             {
                 F.Close();
-            }
+            }*/
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -113,6 +116,7 @@ namespace MyMailClient
                         {
                             im.AuthOnServer();
                             authorizedUsers.AddLast(new AuthorizedUser(s[i], s[i + 1], im));
+                            currentUser = authorizedUsers.Last.Value;
                             usersBox.Items.Add(s[i]);
                             if (!usersBox.Enabled)
                             {
@@ -153,7 +157,7 @@ namespace MyMailClient
 
         }
 
-        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        private async void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
             
             if (currentUser == null)
@@ -174,8 +178,8 @@ namespace MyMailClient
             // здесб
             if (BoxNum >= 0)
             {
-
-                LastUNSEEN = currentUser.imapClient.GetNewEmailsInBox(BoxNum, FilesWork.GetAllLoadedEmailsInForder(foldPath), foldPath);
+                LastUNSEEN = await Task.Run(()=>currentUser.imapClient.GetNewEmailsInBox(BoxNum, FilesWork.GetAllLoadedEmailsInForder(foldPath), foldPath));
+                //LastUNSEEN = currentUser.imapClient.GetNewEmailsInBox(BoxNum, FilesWork.GetAllLoadedEmailsInForder(foldPath), foldPath);
                 mailFolderInfo.number = BoxNum;
     
 
@@ -183,12 +187,6 @@ namespace MyMailClient
             
             //FilesWork.ShowEmailsInFolder("mail\\" + AccountName + "-mails\\" + selItem[0].Text,listView2,ref mailFolderInfo);       
             FilesWork.ShowEmailsInFolder(mailFolderInfo.path, listView2, ref mailFolderInfo, LastUNSEEN);
-        }
-
-        private void AddMessage_Click(object sender, EventArgs e)
-        {
-            
-
         }
 
         private void listView2_SelectedIndexChanged(object sender, EventArgs e)
@@ -297,7 +295,7 @@ namespace MyMailClient
 
         }
 
-        private void поместитьВСпамToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void поместитьВСпамToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
 
@@ -307,7 +305,6 @@ namespace MyMailClient
             var item = selItem[0];
             try {
                 int id = mailFolderInfo.GetUidByIndex(item.Text);
-                selectedmail = id;
                 if (id >= 0)
                 {
                     string path = mailFolderInfo.path + "\\" + (id).ToString() + ".txt";
@@ -318,11 +315,12 @@ namespace MyMailClient
                         string foldPath = "mail\\" + AccountName + "-mails\\" +"Spam" ;
                         if (mailFolderInfo.number != BoxNum)
                         {
-                            currentUser.imapClient.ChangeFolder(mailFolderInfo.number, BoxNum, id);
+                            
                             File.Copy(path, foldPath + "\\" + (id).ToString() + ".txt");
                             File.Delete(path);
 
                             FilesWork.ShowEmailsInFolder(mailFolderInfo.path, listView2, ref mailFolderInfo, LastUNSEEN);
+                            await Task.Run(() => currentUser.imapClient.ChangeFolder(mailFolderInfo.number, BoxNum, id));
                         }
                     }
                     catch {
@@ -345,7 +343,6 @@ namespace MyMailClient
             try
             {
                 int id = mailFolderInfo.GetUidByIndex(item.Text);
-                selectedmail = id;
                 if (id >= 0)
                 {
                     string path = mailFolderInfo.path + "\\" + (id).ToString() + ".txt";
@@ -376,10 +373,272 @@ namespace MyMailClient
 
         private void удалитьБезвозвратноToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            var selItem = listView2.SelectedItems;
+            if (selItem.Count <= 0)
+                return;
+            var item = selItem[0];
 
+            try
+            {
+                int id = mailFolderInfo.GetUidByIndex(item.Text);
+                if (id >= 0)
+                {
+                    string path = mailFolderInfo.path + "\\" + (id).ToString() + ".txt";
+                    try
+                    {
+                        string AccountName = currentUser.login.Substring(0, currentUser.login.IndexOf("@"));
+                        currentUser.imapClient.DeleteMessage(id, mailFolderInfo.number);
+                        File.Delete(path);
+                        FilesWork.ShowEmailsInFolder(mailFolderInfo.path, listView2, ref mailFolderInfo, LastUNSEEN);           
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Ошибка, попробуйте снова");
+                    }
+                }
+
+            }
+            catch { }
+
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosedEventArgs e)
+        {
+            FileStream F = new FileStream("users.dat", FileMode.Create, FileAccess.Write);
+
+            try
+            {
+                foreach (AuthorizedUser au in authorizedUsers)
+                {
+                    au.imapClient.DisconnectFromServer();
+                    string s = au.login + "|" + au.passw + "|";
+                    byte[] buf = Encoding.UTF8.GetBytes(s);
+                    F.Write(buf, 0, buf.Length);
+                    //Закрыть все соединения
+                }
+            }
+            finally
+            {
+                F.Close();
+            }
+        }
+
+
+        // =========================================================
+        // =========================================================
+        //Отправка сообщений
+
+        List<string> MessageAttachments = new List<string>();
+
+        private void AddMessage_Click(object sender, EventArgs e)
+        {
+            listView2.Enabled = false;
+            listView1.Enabled = false;
+            if (currentUser==null) {
+                return;
+            }
+            groupBox1.Visible = true;
+            MessageContentBox.Visible = false;
+            ClearInputs();
+
+        }
+
+        private void SendButtton_Click(object sender, EventArgs e)
+        {
+
+
+            string From = textBoxFrom.Text;
+            string To = textBoxTo.Text;
+            string Content = textBox1.Text;
+
+            if (!IsValidEmail(To)) {
+                MessageBox.Show("Некорректный email получателя");
+                return;
+            }
+
+            if (From == "")
+                From = currentUser.login;
+            MailAddress from = new MailAddress(currentUser.login, From);
+
+            MailAddress to = new MailAddress(To);
+
+            MailMessage m = new MailMessage(from, to);
+
+            m.Subject = textBoxSubject.Text;
+            m.Body = Content;
+            m.IsBodyHtml = true;
+            foreach (string s in MessageAttachments) {
+                if (File.Exists(s)) {
+                    m.Attachments.Add(new Attachment(s));
+         
+                }
+
+            }
+            try
+            {
+                // адрес smtp-сервера и порт, с которого будем отправлять письмо
+                SmtpClient smtp = new SmtpClient("smtp.mail.ru", 587);
+                // логин и пароль
+                smtp.Credentials = new System.Net.NetworkCredential (currentUser.login, currentUser.passw);
+                smtp.EnableSsl = true;
+                smtp.Send(m);
+            }
+            catch(Exception ex)
+            
+            {
+                MessageBox.Show("Cannot send a message");
+                return;
+
+            }
+
+            listView2.Enabled = true;
+            listView1.Enabled = true;
+            MessageContentBox.Visible = true;
+            groupBox1.Visible = false;
+            LabelInfo.Text = "Cообщение отправлено";
+            timer1.Enabled = true;
         }
 
 
 
+        private void CancelSendButtton_Click(object sender, EventArgs e)
+        {
+            MessageContentBox.Visible = true;
+            groupBox1.Visible = false;
+            listView2.Enabled = true ;
+            listView1.Enabled = true;
+        }
+
+
+        void ClearInputs()
+        {
+            textBoxFrom.Text = "";
+            textBoxTo.Text = "";
+            textBoxSubject.Text = "";
+            textBox1.Text = "";
+            listView4.Clear();
+            MessageAttachments.Clear();
+        }
+
+        private void AddAttachment_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.CheckFileExists = true;
+            if (openFileDialog1.ShowDialog()== DialogResult.OK)
+            {
+                var files = openFileDialog1.FileNames;
+                foreach (string s in files)
+                {
+                    ListViewItem viewItem = new ListViewItem(Path.GetFileName(s));
+                    string tmp = Path.GetExtension(s).Replace(".", "");
+                    if (File.Exists("icons\\" + tmp + ".png"))
+                        viewItem.ImageKey = tmp + ".png";
+                    else
+                        viewItem.ImageKey = "blank.png";
+                    listView4.Items.Add(viewItem);
+                    MessageAttachments.Add(s);
+
+
+                }
+            }
+        }
+
+        bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void отменаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem l in listView4.SelectedItems )
+            {
+                listView4.Items.Remove(l);
+                string filename = l.Text;
+                var DeleteVals = new List<string>();
+                foreach (string s in MessageAttachments) {
+                    if (!(filename == Path.GetFileName(s)))
+                    {
+                        DeleteVals.Add(s);
+                    }
+                }
+                MessageAttachments = DeleteVals;
+            }
+        }
+
+        private async void RefreshButton_Click(object sender, EventArgs e)
+        {
+            if (currentUser == null || mailFolderInfo==null)
+                return;
+            RefreshButton.Enabled = false;
+            listView1.Enabled = false;
+            int BoxNum = mailFolderInfo.number;
+            
+            // здесб
+            if (BoxNum >= 0)
+            {
+                LastUNSEEN = await Task.Run(() => currentUser.imapClient.GetNewEmailsInBox(BoxNum, FilesWork.GetAllLoadedEmailsInForder(mailFolderInfo.path), mailFolderInfo.path));
+                //LastUNSEEN = currentUser.imapClient.GetNewEmailsInBox(BoxNum, FilesWork.GetAllLoadedEmailsInForder(foldPath), foldPath);
+            }
+
+            //FilesWork.ShowEmailsInFolder("mail\\" + AccountName + "-mails\\" + selItem[0].Text,listView2,ref mailFolderInfo);       
+            FilesWork.ShowEmailsInFolder(mailFolderInfo.path, listView2, ref mailFolderInfo, LastUNSEEN);
+            listView1.Enabled = true;
+            RefreshButton.Enabled = true;
+            LabelInfo.Text = "Cообщения обновлены";
+            timer1.Enabled = true;
+        }
+
+        private void LabelInfo_Click(object sender, EventArgs e)
+        {
+            LabelInfo.Text = "";
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            timer1.Enabled = false; 
+            LabelInfo.Text = "";
+        }
+
+        private void выходИзАккаунтаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void выходИзАккаунтаToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (currentUser == null)
+                return;
+            usersBox.Items.Remove(currentUser.login);
+            usersBox.SelectedText = "";
+            currentUser.imapClient.DisconnectFromServer();
+
+            authorizedUsers.Remove(currentUser);
+            listView1.Items.Clear();
+            listView2.Items.Clear();
+            listView3.Items.Clear();
+            ClearInputs();
+
+            webBrowser1.DocumentText = "";
+            SubjectLabel.Text = "";
+            label1.Text = "";
+            label2.Text = "";
+            label3.Text = "";
+            usersBox.Text = "";
+            currentUser = null;
+            mailFolderInfo = null;
+     
+        }
+
+        private void закрытьToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

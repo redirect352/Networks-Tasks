@@ -98,6 +98,8 @@ namespace MyMailClient
             {
 
                 ListViewItem tmp = new ListViewItem(MimeDecrypter.GetSubjectAndDate(info.FullName, ref time));
+                if (tmp.Text == "")
+                    tmp.Text = "No data";
                 //if () { }
                 groupName = time.Day.ToString() + "." + time.Month.ToString() + "." + time.Year.ToString();
                 bool NeednewGroup = true;

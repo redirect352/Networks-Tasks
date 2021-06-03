@@ -140,6 +140,7 @@ namespace MailClasses
             catch (Exception ex)
             {
                 SaveLogs("Select exeption\n\n");
+                return;
             }
 
             int l= CopyCommand(MessageUID,boxes.ElementAt(DestinationBoxNumber).ServerPath,"UID");
@@ -157,6 +158,27 @@ namespace MailClasses
             }
 
         }
+
+        public void DeleteMessage(int MessageId, int BoxNumber)
+        {
+            try
+            {
+                SelectBox(boxes.ElementAt(BoxNumber).ServerPath);
+            }
+            catch (Exception ex)
+            {
+                SaveLogs("Select exeption\n\n");
+                return;
+            }
+
+            int l = StoreCommand(MessageId, "+FLAGS.SILENT (\\Deleted)", "UID");
+            if (l == 0)
+                EXPUNGECommand();
+            else
+               { throw new ImapExeption("Cannot delete"); }
+
+        }
+
 
         //Вход в аккаунт
         public void AuthOnServer() {
@@ -1103,7 +1125,7 @@ namespace MailClasses
 
             }
 
-            return null;
+            return new string[]{ };
         }
         
 
@@ -1342,7 +1364,15 @@ namespace MailClasses
         private void SaveLogs(string s)
         {
             //сохранение куда-то там...
-            FileStream f = new FileStream("d:/log.txt",FileMode.OpenOrCreate);  
+            FileStream f;
+            try
+            {
+                 f = new FileStream("d:/log.txt", FileMode.OpenOrCreate);
+            }
+            catch {
+                return;
+            }
+
             try
             {
                 f.Position = f.Length;

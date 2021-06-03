@@ -127,6 +127,8 @@ namespace MailClasses.MimeWork
 
                 var mime = b.ParseMessage();
                 string s = mime.HtmlBody;
+                if (mime.HtmlBody == null)
+                    s = mime.TextBody;
                 wb.DocumentText = s;
                 attachments.Clear();
                 //Рас
@@ -141,7 +143,12 @@ namespace MailClasses.MimeWork
                     {
                         var t = m.Headers;
                         ListViewItem viewItem = new ListViewItem(m.ContentDisposition.FileName);
-                        viewItem.ImageKey = "txt.png";
+                        string tmp = Path.GetExtension(m.ContentDisposition.FileName).Replace(".","");
+                        if (File.Exists("icons\\"+tmp+".png")) 
+                            viewItem.ImageKey = tmp + ".png";
+                        else
+                            viewItem.ImageKey =  "blank.png";
+
                         attachments.Items.Add(viewItem);
 
                         if (!dir.Contains<string>(AttachPath+"\\"+ m.ContentDisposition.FileName))
