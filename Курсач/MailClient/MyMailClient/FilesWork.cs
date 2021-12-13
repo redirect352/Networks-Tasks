@@ -12,7 +12,7 @@ using MailClasses.User;
 namespace MyMailClient
 {
 
-   
+
 
     public class FilesWork
     {
@@ -23,15 +23,15 @@ namespace MyMailClient
             "ics", "iso", "java", "jpg", "js", "key", "less", "mid", "mp3", "mp4" };
 
         public void GetPathtoicon(string filepath) {
-            string ext = filepath.Substring(filepath.LastIndexOf('.')+1);
-            foreach(string s in ImageExists)
+            string ext = filepath.Substring(filepath.LastIndexOf('.') + 1);
+            foreach (string s in ImageExists)
             {
-                if (s==ext) {
+                if (s == ext) {
                     //profit
                 }
 
             }
-            
+
         }
 
         public static void CheckAllNeededFoldersExists(string AccountName) {
@@ -39,12 +39,12 @@ namespace MyMailClient
                 Directory.CreateDirectory("mail");
             if (AccountName != "") {
 
-                    Directory.CreateDirectory("mail\\" + AccountName + "-mails");
-                    Directory.CreateDirectory("mail\\" + AccountName + "-mails\\Inbox");
-                    Directory.CreateDirectory("mail\\" + AccountName + "-mails\\Trash");
-                    Directory.CreateDirectory("mail\\" + AccountName + "-mails\\Spam");
-                    Directory.CreateDirectory("mail\\" + AccountName + "-mails\\Sent");
-                
+                Directory.CreateDirectory("mail\\" + AccountName + "-mails");
+                Directory.CreateDirectory("mail\\" + AccountName + "-mails\\Inbox");
+                Directory.CreateDirectory("mail\\" + AccountName + "-mails\\Trash");
+                Directory.CreateDirectory("mail\\" + AccountName + "-mails\\Spam");
+                Directory.CreateDirectory("mail\\" + AccountName + "-mails\\Sent");
+
             }
 
         }
@@ -58,7 +58,7 @@ namespace MyMailClient
                 string buf = "";
                 foreach (string s in dir) {
                     tmp = GetFileNumb(s);
-                    if (tmp!=-1) {
+                    if (tmp != -1) {
                         if (res == null)
                             res = new List<int>();
                         res.Add(tmp);
@@ -84,9 +84,9 @@ namespace MyMailClient
         }
 
 
-        public static void ShowEmailsInFolder(string path, ListView lv,ref mailFolderInfo mf,List<int> UNSEEN)
+        public static void ShowEmailsInFolder(string path, ListView lv, ref mailFolderInfo mf, List<int> UNSEEN)
         {
-            
+
             lv.Items.Clear();
             DirectoryInfo d = new DirectoryInfo(path);
             var f = d.GetFiles();
@@ -116,22 +116,22 @@ namespace MyMailClient
                     ListViewGroup group = new ListViewGroup();
                     group.Name = groupName;
                     group.Header = groupName;
-                    
+
                     lv.Groups.Add(group);
                     tmp.Group = group;
                 }
                 int MessageUid = FilesWork.GetFileNumb(info.FullName);
                 if (UNSEEN.Contains(MessageUid)) {
                     tmp.ForeColor = System.Drawing.Color.DarkBlue;
-                                      
+
                 }
 
                 lv.Items.Add(tmp);
-                if (mf!=null)
-                     mf.Mails.Add(new MailInfo(tmp.Text, MessageUid));
+                if (mf != null)
+                    mf.Mails.Add(new MailInfo(tmp.Text, MessageUid));
                 ind++;
             }
-            lv.ListViewItemSorter = new ListViewComparer(0,SortOrder.Ascending);
+            lv.ListViewItemSorter = new ListViewComparer(0, SortOrder.Ascending);
             lv.Sort();
 
             ListViewGroup[] groups = new ListViewGroup[lv.Groups.Count];
@@ -147,6 +147,32 @@ namespace MyMailClient
         }
 
 
+
+        public static void SortListView(SortOrder order, ListView listView) 
+        {
+            listView.ListViewItemSorter = new ListViewComparer(0, order);
+            listView.Sort();
+            ListViewGroup[] groups = new ListViewGroup[listView.Groups.Count];
+            listView.Groups.CopyTo(groups, 0);
+
+
+            if (order == SortOrder.Ascending)
+            {
+                Array.Sort(groups, (IComparer<ListViewGroup>)(new GroupComparer()));
+
+            }
+            else
+            {
+                Array.Sort(groups, (IComparer<ListViewGroup>)(new GroupComparerDes()));
+
+            }
+            listView.BeginUpdate();
+            listView.Groups.Clear();
+            listView.Groups.AddRange(groups);
+            listView.EndUpdate();
+
+            
+        }
 
         public class ListViewComparer : System.Collections.IComparer
         {
@@ -234,6 +260,16 @@ namespace MyMailClient
                 DateTime time2 = DateTime.Parse(objB.Header);
 
                 return DateTime.Compare(time2,time1);
+            }
+        }
+        class GroupComparerDes : IComparer<ListViewGroup>
+        {
+            public int Compare(ListViewGroup objA, ListViewGroup objB)
+            {
+                DateTime time1 = DateTime.Parse(objA.Header);
+                DateTime time2 = DateTime.Parse(objB.Header);
+
+                return DateTime.Compare(time1, time2);
             }
         }
 

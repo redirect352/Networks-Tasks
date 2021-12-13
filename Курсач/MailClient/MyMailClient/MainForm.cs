@@ -37,7 +37,7 @@ namespace MyMailClient
             groupBox1.Visible = false;
             /*
             DateTime time = new DateTime();
-            MimeDecrypter.DecryptMessage("mail\\testmail898989-mails\\Inbox\\15.txt",webBrowser1, listView3);
+            MimeDecrypter.DecryptMessage("mail\\testmail898989-mails\\Inbox\\15.txt",webBrowser1, listView3,imageList1);
             MimeDecrypter.GetSubjectAndDate("mail\\testmail898989-mails\\Inbox\\15.txt",ref time);
             MimeDecrypter.SetHeaders("mail\\testmail898989-mails\\Inbox\\15.txt", SubjectLabel, label3, label1,  label2);
          
@@ -45,7 +45,7 @@ namespace MyMailClient
             und.Add(1);
             und.Add(2);
             und.Add(3);
-            FilesWork.ShowEmailsInFolder("mail\\testmail898989-mails\\Inbox",listView2,ref mailFolderInfo,und);    */
+            FilesWork.ShowEmailsInFolder("mail\\testmail898989-mails\\Inbox",listView2,ref mailFolderInfo,und);*/    
         }
         //testmail898989@mail.ru
         //8aofts6M06dvKV7aiaBD
@@ -212,7 +212,7 @@ namespace MyMailClient
             selectedmail = id;
             if (id >=0 ) {
                 string path = mailFolderInfo.path + "\\" + (id).ToString() + ".txt";
-                MimeDecrypter.DecryptMessage(path, webBrowser1, listView3);
+                MimeDecrypter.DecryptMessage(path, webBrowser1, listView3,imageList1);
                 MimeDecrypter.SetHeaders(path, SubjectLabel, label3, label1, label2);
             }        
         }
@@ -321,6 +321,8 @@ namespace MyMailClient
 
                             FilesWork.ShowEmailsInFolder(mailFolderInfo.path, listView2, ref mailFolderInfo, LastUNSEEN);
                             await Task.Run(() => currentUser.imapClient.ChangeFolder(mailFolderInfo.number, BoxNum, id));
+                            LabelInfo.Text = "Cообщение помещено в спам";
+                            timer1.Enabled = true;
                         }
                     }
                     catch {
@@ -358,6 +360,8 @@ namespace MyMailClient
                             File.Delete(path);
 
                             FilesWork.ShowEmailsInFolder(mailFolderInfo.path, listView2, ref mailFolderInfo, LastUNSEEN);
+                            LabelInfo.Text = "Cообщение помещено в Корзину";
+                            timer1.Enabled = true;
                         }
                     }
                     catch
@@ -389,7 +393,9 @@ namespace MyMailClient
                         string AccountName = currentUser.login.Substring(0, currentUser.login.IndexOf("@"));
                         currentUser.imapClient.DeleteMessage(id, mailFolderInfo.number);
                         File.Delete(path);
-                        FilesWork.ShowEmailsInFolder(mailFolderInfo.path, listView2, ref mailFolderInfo, LastUNSEEN);           
+                        FilesWork.ShowEmailsInFolder(mailFolderInfo.path, listView2, ref mailFolderInfo, LastUNSEEN);
+                        LabelInfo.Text = "Cообщение удалено";
+                        timer1.Enabled = true;
                     }
                     catch
                     {
@@ -639,6 +645,22 @@ namespace MyMailClient
         private void закрытьToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void SortButton_Click(object sender, EventArgs e)
+        {
+            if (listView2.Items.Count == 0) { return; }
+
+            if (SortButton.Text == "V")
+            {
+                SortButton.Text = @"/\";
+                FilesWork.SortListView(SortOrder.Descending, listView2);
+            }
+            else
+            {
+                SortButton.Text = "V";
+                FilesWork.SortListView(SortOrder.Ascending,listView2);
+            }
         }
     }
 }

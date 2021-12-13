@@ -115,7 +115,7 @@ namespace MailClasses.MimeWork
         }
 
 
-        public static void  DecryptMessage(string path, WebBrowser wb, ListView attachments)
+        public static void  DecryptMessage(string path, WebBrowser wb, ListView attachments, ImageList im)
         {
 
             
@@ -137,6 +137,8 @@ namespace MailClasses.MimeWork
 
                 if (Attach.Count<MimeEntity>()> 0)
                 {
+                    
+                    
                     Directory.CreateDirectory(AttachPath);
                     var dir = Directory.EnumerateFiles(AttachPath);
                     foreach (MimeEntity m in Attach)
@@ -144,7 +146,7 @@ namespace MailClasses.MimeWork
                         var t = m.Headers;
                         ListViewItem viewItem = new ListViewItem(m.ContentDisposition.FileName);
                         string tmp = Path.GetExtension(m.ContentDisposition.FileName).Replace(".","");
-                        if (File.Exists("icons\\"+tmp+".png")) 
+                        if (im.Images.ContainsKey(tmp + ".png")) 
                             viewItem.ImageKey = tmp + ".png";
                         else
                             viewItem.ImageKey =  "blank.png";

@@ -29,15 +29,18 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewGroup listViewGroup21 = new System.Windows.Forms.ListViewGroup("Основные", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup22 = new System.Windows.Forms.ListViewGroup("Дополнительные", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Основные", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("Дополнительные", System.Windows.Forms.HorizontalAlignment.Left);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("ss/ddd", "aac.png");
             this.UserAccountData = new System.Windows.Forms.GroupBox();
             this.listView1 = new System.Windows.Forms.ListView();
             this.AddMessage = new System.Windows.Forms.Button();
             this.usersBox = new System.Windows.Forms.ComboBox();
             this.AccountsButton = new System.Windows.Forms.Button();
             this.mailtopsBox = new System.Windows.Forms.GroupBox();
+            this.LabelInfo = new System.Windows.Forms.Label();
+            this.RefreshButton = new System.Windows.Forms.Button();
             this.listView2 = new System.Windows.Forms.ListView();
             this.MessagesListVievContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.поместитьВСпамToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,7 +53,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.SubjectLabel = new System.Windows.Forms.Label();
             this.listView3 = new System.Windows.Forms.ListView();
-            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.label4 = new System.Windows.Forms.Label();
             this.MessageContentBox = new System.Windows.Forms.GroupBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -69,13 +71,13 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.RefreshButton = new System.Windows.Forms.Button();
-            this.LabelInfo = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.выходИзАккаунтаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.выходИзАккаунтаToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.закрытьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.SortButton = new System.Windows.Forms.Button();
+            this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.UserAccountData.SuspendLayout();
             this.mailtopsBox.SuspendLayout();
             this.MessagesListVievContextMenu.SuspendLayout();
@@ -104,14 +106,14 @@
             this.listView1.BackColor = System.Drawing.Color.WhiteSmoke;
             this.listView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.listView1.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            listViewGroup21.Header = "Основные";
-            listViewGroup21.Name = "Based";
-            listViewGroup21.Tag = "";
-            listViewGroup22.Header = "Дополнительные";
-            listViewGroup22.Name = "others";
+            listViewGroup3.Header = "Основные";
+            listViewGroup3.Name = "Based";
+            listViewGroup3.Tag = "";
+            listViewGroup4.Header = "Дополнительные";
+            listViewGroup4.Name = "others";
             this.listView1.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup21,
-            listViewGroup22});
+            listViewGroup3,
+            listViewGroup4});
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(4, 154);
             this.listView1.Margin = new System.Windows.Forms.Padding(2);
@@ -144,7 +146,7 @@
             this.usersBox.Location = new System.Drawing.Point(0, 118);
             this.usersBox.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.usersBox.Name = "usersBox";
-            this.usersBox.Size = new System.Drawing.Size(166, 27);
+            this.usersBox.Size = new System.Drawing.Size(166, 37);
             this.usersBox.TabIndex = 1;
             // 
             // AccountsButton
@@ -162,6 +164,7 @@
             // 
             // mailtopsBox
             // 
+            this.mailtopsBox.Controls.Add(this.SortButton);
             this.mailtopsBox.Controls.Add(this.LabelInfo);
             this.mailtopsBox.Controls.Add(this.RefreshButton);
             this.mailtopsBox.Controls.Add(this.listView2);
@@ -175,6 +178,29 @@
             this.mailtopsBox.TabStop = false;
             this.mailtopsBox.Text = "Сообщения";
             this.mailtopsBox.Enter += new System.EventHandler(this.mailtopsBox_Enter);
+            // 
+            // LabelInfo
+            // 
+            this.LabelInfo.AutoSize = true;
+            this.LabelInfo.Font = new System.Drawing.Font("Calibri", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.LabelInfo.Location = new System.Drawing.Point(5, 28);
+            this.LabelInfo.Name = "LabelInfo";
+            this.LabelInfo.Size = new System.Drawing.Size(0, 28);
+            this.LabelInfo.TabIndex = 2;
+            this.LabelInfo.Click += new System.EventHandler(this.LabelInfo_Click);
+            // 
+            // RefreshButton
+            // 
+            this.RefreshButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.RefreshButton.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.RefreshButton.ForeColor = System.Drawing.Color.Cornsilk;
+            this.RefreshButton.Image = ((System.Drawing.Image)(resources.GetObject("RefreshButton.Image")));
+            this.RefreshButton.Location = new System.Drawing.Point(236, 11);
+            this.RefreshButton.Name = "RefreshButton";
+            this.RefreshButton.Size = new System.Drawing.Size(40, 43);
+            this.RefreshButton.TabIndex = 1;
+            this.RefreshButton.UseVisualStyleBackColor = true;
+            this.RefreshButton.Click += new System.EventHandler(this.RefreshButton_Click);
             // 
             // listView2
             // 
@@ -194,16 +220,17 @@
             // 
             // MessagesListVievContextMenu
             // 
+            this.MessagesListVievContextMenu.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.MessagesListVievContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.поместитьВСпамToolStripMenuItem,
             this.удалитьСообщениеToolStripMenuItem});
             this.MessagesListVievContextMenu.Name = "MessagesListVievContextMenu";
-            this.MessagesListVievContextMenu.Size = new System.Drawing.Size(186, 48);
+            this.MessagesListVievContextMenu.Size = new System.Drawing.Size(247, 68);
             // 
             // поместитьВСпамToolStripMenuItem
             // 
             this.поместитьВСпамToolStripMenuItem.Name = "поместитьВСпамToolStripMenuItem";
-            this.поместитьВСпамToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.поместитьВСпамToolStripMenuItem.Size = new System.Drawing.Size(246, 32);
             this.поместитьВСпамToolStripMenuItem.Text = "Поместить в спам";
             this.поместитьВСпамToolStripMenuItem.Click += new System.EventHandler(this.поместитьВСпамToolStripMenuItem_Click);
             // 
@@ -213,20 +240,20 @@
             this.поместитьВКорзинуToolStripMenuItem,
             this.удалитьБезвозвратноToolStripMenuItem});
             this.удалитьСообщениеToolStripMenuItem.Name = "удалитьСообщениеToolStripMenuItem";
-            this.удалитьСообщениеToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.удалитьСообщениеToolStripMenuItem.Size = new System.Drawing.Size(246, 32);
             this.удалитьСообщениеToolStripMenuItem.Text = "Удалить сообщение";
             // 
             // поместитьВКорзинуToolStripMenuItem
             // 
             this.поместитьВКорзинуToolStripMenuItem.Name = "поместитьВКорзинуToolStripMenuItem";
-            this.поместитьВКорзинуToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.поместитьВКорзинуToolStripMenuItem.Size = new System.Drawing.Size(297, 34);
             this.поместитьВКорзинуToolStripMenuItem.Text = "Поместить в корзину";
             this.поместитьВКорзинуToolStripMenuItem.Click += new System.EventHandler(this.поместитьВКорзинуToolStripMenuItem_Click);
             // 
             // удалитьБезвозвратноToolStripMenuItem
             // 
             this.удалитьБезвозвратноToolStripMenuItem.Name = "удалитьБезвозвратноToolStripMenuItem";
-            this.удалитьБезвозвратноToolStripMenuItem.Size = new System.Drawing.Size(195, 22);
+            this.удалитьБезвозвратноToolStripMenuItem.Size = new System.Drawing.Size(297, 34);
             this.удалитьБезвозвратноToolStripMenuItem.Text = "Удалить безвозвратно";
             this.удалитьБезвозвратноToolStripMenuItem.Click += new System.EventHandler(this.удалитьБезвозвратноToolStripMenuItem_Click);
             // 
@@ -246,7 +273,7 @@
             this.label1.Location = new System.Drawing.Point(21, 46);
             this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(101, 19);
+            this.label1.Size = new System.Drawing.Size(151, 29);
             this.label1.TabIndex = 4;
             this.label1.Text = "Отправитель:";
             // 
@@ -257,7 +284,7 @@
             this.label2.Location = new System.Drawing.Point(21, 70);
             this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(48, 19);
+            this.label2.Size = new System.Drawing.Size(72, 29);
             this.label2.TabIndex = 5;
             this.label2.Text = "Кому:";
             // 
@@ -269,7 +296,7 @@
             this.label3.Location = new System.Drawing.Point(22, 89);
             this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(0, 19);
+            this.label3.Size = new System.Drawing.Size(0, 29);
             this.label3.TabIndex = 6;
             this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
@@ -280,13 +307,12 @@
             this.SubjectLabel.Location = new System.Drawing.Point(5, 17);
             this.SubjectLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.SubjectLabel.Name = "SubjectLabel";
-            this.SubjectLabel.Size = new System.Drawing.Size(0, 26);
+            this.SubjectLabel.Size = new System.Drawing.Size(0, 39);
             this.SubjectLabel.TabIndex = 7;
             // 
             // listView3
             // 
             this.listView3.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.listView3.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.listView3.Font = new System.Drawing.Font("Bahnschrift", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.listView3.HideSelection = false;
             this.listView3.LargeImageList = this.imageList1;
@@ -295,80 +321,10 @@
             this.listView3.MultiSelect = false;
             this.listView3.Name = "listView3";
             this.listView3.Size = new System.Drawing.Size(362, 61);
-            this.listView3.StateImageList = this.imageList1;
             this.listView3.TabIndex = 4;
             this.listView3.UseCompatibleStateImageBehavior = false;
             this.listView3.View = System.Windows.Forms.View.Tile;
             this.listView3.SelectedIndexChanged += new System.EventHandler(this.listView3_SelectedIndexChanged);
-            // 
-            // imageList1
-            // 
-            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
-            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageList1.Images.SetKeyName(0, "_blank.png");
-            this.imageList1.Images.SetKeyName(1, "_page.png");
-            this.imageList1.Images.SetKeyName(2, "aac.png");
-            this.imageList1.Images.SetKeyName(3, "ai.png");
-            this.imageList1.Images.SetKeyName(4, "aiff.png");
-            this.imageList1.Images.SetKeyName(5, "avi.png");
-            this.imageList1.Images.SetKeyName(6, "bmp.png");
-            this.imageList1.Images.SetKeyName(7, "c.png");
-            this.imageList1.Images.SetKeyName(8, "cpp.png");
-            this.imageList1.Images.SetKeyName(9, "css.png");
-            this.imageList1.Images.SetKeyName(10, "csv.png");
-            this.imageList1.Images.SetKeyName(11, "dat.png");
-            this.imageList1.Images.SetKeyName(12, "dmg.png");
-            this.imageList1.Images.SetKeyName(13, "doc.png");
-            this.imageList1.Images.SetKeyName(14, "dotx.png");
-            this.imageList1.Images.SetKeyName(15, "dwg.png");
-            this.imageList1.Images.SetKeyName(16, "dxf.png");
-            this.imageList1.Images.SetKeyName(17, "eps.png");
-            this.imageList1.Images.SetKeyName(18, "exe.png");
-            this.imageList1.Images.SetKeyName(19, "flv.png");
-            this.imageList1.Images.SetKeyName(20, "gif.png");
-            this.imageList1.Images.SetKeyName(21, "h.png");
-            this.imageList1.Images.SetKeyName(22, "hpp.png");
-            this.imageList1.Images.SetKeyName(23, "html.png");
-            this.imageList1.Images.SetKeyName(24, "ics.png");
-            this.imageList1.Images.SetKeyName(25, "iso.png");
-            this.imageList1.Images.SetKeyName(26, "java.png");
-            this.imageList1.Images.SetKeyName(27, "jpg.png");
-            this.imageList1.Images.SetKeyName(28, "js.png");
-            this.imageList1.Images.SetKeyName(29, "key.png");
-            this.imageList1.Images.SetKeyName(30, "less.png");
-            this.imageList1.Images.SetKeyName(31, "mid.png");
-            this.imageList1.Images.SetKeyName(32, "mp3.png");
-            this.imageList1.Images.SetKeyName(33, "mp4.png");
-            this.imageList1.Images.SetKeyName(34, "mpg.png");
-            this.imageList1.Images.SetKeyName(35, "odf.png");
-            this.imageList1.Images.SetKeyName(36, "ods.png");
-            this.imageList1.Images.SetKeyName(37, "odt.png");
-            this.imageList1.Images.SetKeyName(38, "otp.png");
-            this.imageList1.Images.SetKeyName(39, "ots.png");
-            this.imageList1.Images.SetKeyName(40, "ott.png");
-            this.imageList1.Images.SetKeyName(41, "pdf.png");
-            this.imageList1.Images.SetKeyName(42, "php.png");
-            this.imageList1.Images.SetKeyName(43, "png.png");
-            this.imageList1.Images.SetKeyName(44, "ppt.png");
-            this.imageList1.Images.SetKeyName(45, "psd.png");
-            this.imageList1.Images.SetKeyName(46, "py.png");
-            this.imageList1.Images.SetKeyName(47, "qt.png");
-            this.imageList1.Images.SetKeyName(48, "rar.png");
-            this.imageList1.Images.SetKeyName(49, "rb.png");
-            this.imageList1.Images.SetKeyName(50, "rtf.png");
-            this.imageList1.Images.SetKeyName(51, "sass.png");
-            this.imageList1.Images.SetKeyName(52, "scss.png");
-            this.imageList1.Images.SetKeyName(53, "sql.png");
-            this.imageList1.Images.SetKeyName(54, "tga.png");
-            this.imageList1.Images.SetKeyName(55, "tgz.png");
-            this.imageList1.Images.SetKeyName(56, "tiff.png");
-            this.imageList1.Images.SetKeyName(57, "txt.png");
-            this.imageList1.Images.SetKeyName(58, "wav.png");
-            this.imageList1.Images.SetKeyName(59, "xls.png");
-            this.imageList1.Images.SetKeyName(60, "xlsx.png");
-            this.imageList1.Images.SetKeyName(61, "xml.png");
-            this.imageList1.Images.SetKeyName(62, "yml.png");
-            this.imageList1.Images.SetKeyName(63, "zip.png");
             // 
             // label4
             // 
@@ -377,7 +333,7 @@
             this.label4.Location = new System.Drawing.Point(32, 482);
             this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(96, 23);
+            this.label4.Size = new System.Drawing.Size(149, 36);
             this.label4.TabIndex = 8;
             this.label4.Text = "Вложения:";
             // 
@@ -471,7 +427,7 @@
             this.textBoxSubject.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.textBoxSubject.Location = new System.Drawing.Point(104, 20);
             this.textBoxSubject.Name = "textBoxSubject";
-            this.textBoxSubject.Size = new System.Drawing.Size(465, 27);
+            this.textBoxSubject.Size = new System.Drawing.Size(465, 37);
             this.textBoxSubject.TabIndex = 14;
             // 
             // label8
@@ -481,7 +437,7 @@
             this.label8.Location = new System.Drawing.Point(17, 20);
             this.label8.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(47, 19);
+            this.label8.Size = new System.Drawing.Size(69, 29);
             this.label8.TabIndex = 13;
             this.label8.Text = "Тема:";
             // 
@@ -490,7 +446,7 @@
             this.textBoxTo.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.textBoxTo.Location = new System.Drawing.Point(104, 91);
             this.textBoxTo.Name = "textBoxTo";
-            this.textBoxTo.Size = new System.Drawing.Size(220, 23);
+            this.textBoxTo.Size = new System.Drawing.Size(220, 31);
             this.textBoxTo.TabIndex = 12;
             // 
             // textBoxFrom
@@ -498,7 +454,7 @@
             this.textBoxFrom.Font = new System.Drawing.Font("Calibri", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.textBoxFrom.Location = new System.Drawing.Point(104, 58);
             this.textBoxFrom.Name = "textBoxFrom";
-            this.textBoxFrom.Size = new System.Drawing.Size(220, 23);
+            this.textBoxFrom.Size = new System.Drawing.Size(220, 31);
             this.textBoxFrom.TabIndex = 11;
             // 
             // listView4
@@ -508,27 +464,30 @@
             this.listView4.ContextMenuStrip = this.Attachments;
             this.listView4.Font = new System.Drawing.Font("Bahnschrift", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.listView4.HideSelection = false;
+            this.listView4.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
+            listViewItem2});
             this.listView4.LargeImageList = this.imageList1;
             this.listView4.Location = new System.Drawing.Point(143, 428);
             this.listView4.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.listView4.Name = "listView4";
-            this.listView4.Size = new System.Drawing.Size(402, 61);
-            this.listView4.StateImageList = this.imageList1;
+            this.listView4.Size = new System.Drawing.Size(402, 78);
             this.listView4.TabIndex = 10;
+            this.listView4.TileSize = new System.Drawing.Size(495, 60);
             this.listView4.UseCompatibleStateImageBehavior = false;
             this.listView4.View = System.Windows.Forms.View.Tile;
             // 
             // Attachments
             // 
+            this.Attachments.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.Attachments.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.отменаToolStripMenuItem});
             this.Attachments.Name = "Attachments";
-            this.Attachments.Size = new System.Drawing.Size(119, 26);
+            this.Attachments.Size = new System.Drawing.Size(149, 36);
             // 
             // отменаToolStripMenuItem
             // 
             this.отменаToolStripMenuItem.Name = "отменаToolStripMenuItem";
-            this.отменаToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            this.отменаToolStripMenuItem.Size = new System.Drawing.Size(148, 32);
             this.отменаToolStripMenuItem.Text = "Удалить";
             this.отменаToolStripMenuItem.Click += new System.EventHandler(this.отменаToolStripMenuItem_Click);
             // 
@@ -539,7 +498,7 @@
             this.label7.Location = new System.Drawing.Point(17, 428);
             this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(96, 23);
+            this.label7.Size = new System.Drawing.Size(149, 36);
             this.label7.TabIndex = 10;
             this.label7.Text = "Вложения:";
             // 
@@ -550,7 +509,7 @@
             this.label6.Location = new System.Drawing.Point(17, 90);
             this.label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(48, 19);
+            this.label6.Size = new System.Drawing.Size(72, 29);
             this.label6.TabIndex = 10;
             this.label6.Text = "Кому:";
             // 
@@ -561,36 +520,13 @@
             this.label5.Location = new System.Drawing.Point(17, 56);
             this.label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(30, 19);
+            this.label5.Size = new System.Drawing.Size(44, 29);
             this.label5.TabIndex = 10;
             this.label5.Text = "От:";
             // 
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
-            // 
-            // RefreshButton
-            // 
-            this.RefreshButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.RefreshButton.Font = new System.Drawing.Font("Calibri", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.RefreshButton.ForeColor = System.Drawing.Color.Cornsilk;
-            this.RefreshButton.Image = ((System.Drawing.Image)(resources.GetObject("RefreshButton.Image")));
-            this.RefreshButton.Location = new System.Drawing.Point(236, 11);
-            this.RefreshButton.Name = "RefreshButton";
-            this.RefreshButton.Size = new System.Drawing.Size(40, 43);
-            this.RefreshButton.TabIndex = 1;
-            this.RefreshButton.UseVisualStyleBackColor = true;
-            this.RefreshButton.Click += new System.EventHandler(this.RefreshButton_Click);
-            // 
-            // LabelInfo
-            // 
-            this.LabelInfo.AutoSize = true;
-            this.LabelInfo.Font = new System.Drawing.Font("Calibri", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.LabelInfo.Location = new System.Drawing.Point(5, 28);
-            this.LabelInfo.Name = "LabelInfo";
-            this.LabelInfo.Size = new System.Drawing.Size(0, 18);
-            this.LabelInfo.TabIndex = 2;
-            this.LabelInfo.Click += new System.EventHandler(this.LabelInfo_Click);
             // 
             // timer1
             // 
@@ -599,11 +535,13 @@
             // 
             // menuStrip1
             // 
+            this.menuStrip1.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.выходИзАккаунтаToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1076, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1076, 36);
             this.menuStrip1.TabIndex = 10;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -613,27 +551,111 @@
             this.выходИзАккаунтаToolStripMenuItem1,
             this.закрытьToolStripMenuItem});
             this.выходИзАккаунтаToolStripMenuItem.Name = "выходИзАккаунтаToolStripMenuItem";
-            this.выходИзАккаунтаToolStripMenuItem.Size = new System.Drawing.Size(56, 20);
+            this.выходИзАккаунтаToolStripMenuItem.Size = new System.Drawing.Size(83, 30);
             this.выходИзАккаунтаToolStripMenuItem.Text = "Опции";
             this.выходИзАккаунтаToolStripMenuItem.Click += new System.EventHandler(this.выходИзАккаунтаToolStripMenuItem_Click);
             // 
             // выходИзАккаунтаToolStripMenuItem1
             // 
             this.выходИзАккаунтаToolStripMenuItem1.Name = "выходИзАккаунтаToolStripMenuItem1";
-            this.выходИзАккаунтаToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.выходИзАккаунтаToolStripMenuItem1.Size = new System.Drawing.Size(265, 34);
             this.выходИзАккаунтаToolStripMenuItem1.Text = "Выход из аккаунта";
             this.выходИзАккаунтаToolStripMenuItem1.Click += new System.EventHandler(this.выходИзАккаунтаToolStripMenuItem1_Click);
             // 
             // закрытьToolStripMenuItem
             // 
             this.закрытьToolStripMenuItem.Name = "закрытьToolStripMenuItem";
-            this.закрытьToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.закрытьToolStripMenuItem.Size = new System.Drawing.Size(265, 34);
             this.закрытьToolStripMenuItem.Text = "Закрыть";
             this.закрытьToolStripMenuItem.Click += new System.EventHandler(this.закрытьToolStripMenuItem_Click);
             // 
+            // SortButton
+            // 
+            this.SortButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.SortButton.Location = new System.Drawing.Point(187, 17);
+            this.SortButton.Name = "SortButton";
+            this.SortButton.Size = new System.Drawing.Size(43, 34);
+            this.SortButton.TabIndex = 3;
+            this.SortButton.Text = "V";
+            this.SortButton.UseVisualStyleBackColor = true;
+            this.SortButton.Click += new System.EventHandler(this.SortButton_Click);
+            // 
+            // imageList1
+            // 
+            this.imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            this.imageList1.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList1.Images.SetKeyName(0, "_blank.png");
+            this.imageList1.Images.SetKeyName(1, "_page.png");
+            this.imageList1.Images.SetKeyName(2, "aac.png");
+            this.imageList1.Images.SetKeyName(3, "ai.png");
+            this.imageList1.Images.SetKeyName(4, "aiff.png");
+            this.imageList1.Images.SetKeyName(5, "avi.png");
+            this.imageList1.Images.SetKeyName(6, "bmp.png");
+            this.imageList1.Images.SetKeyName(7, "c.png");
+            this.imageList1.Images.SetKeyName(8, "cpp.png");
+            this.imageList1.Images.SetKeyName(9, "css.png");
+            this.imageList1.Images.SetKeyName(10, "csv.png");
+            this.imageList1.Images.SetKeyName(11, "dat.png");
+            this.imageList1.Images.SetKeyName(12, "dmg.png");
+            this.imageList1.Images.SetKeyName(13, "doc.png");
+            this.imageList1.Images.SetKeyName(14, "dotx.png");
+            this.imageList1.Images.SetKeyName(15, "dwg.png");
+            this.imageList1.Images.SetKeyName(16, "dxf.png");
+            this.imageList1.Images.SetKeyName(17, "eps.png");
+            this.imageList1.Images.SetKeyName(18, "exe.png");
+            this.imageList1.Images.SetKeyName(19, "flv.png");
+            this.imageList1.Images.SetKeyName(20, "gif.png");
+            this.imageList1.Images.SetKeyName(21, "h.png");
+            this.imageList1.Images.SetKeyName(22, "hpp.png");
+            this.imageList1.Images.SetKeyName(23, "html.png");
+            this.imageList1.Images.SetKeyName(24, "ics.png");
+            this.imageList1.Images.SetKeyName(25, "iso.png");
+            this.imageList1.Images.SetKeyName(26, "java.png");
+            this.imageList1.Images.SetKeyName(27, "jpg.png");
+            this.imageList1.Images.SetKeyName(28, "js.png");
+            this.imageList1.Images.SetKeyName(29, "key.png");
+            this.imageList1.Images.SetKeyName(30, "less.png");
+            this.imageList1.Images.SetKeyName(31, "mid.png");
+            this.imageList1.Images.SetKeyName(32, "mp3.png");
+            this.imageList1.Images.SetKeyName(33, "mp4.png");
+            this.imageList1.Images.SetKeyName(34, "mpg.png");
+            this.imageList1.Images.SetKeyName(35, "odf.png");
+            this.imageList1.Images.SetKeyName(36, "ods.png");
+            this.imageList1.Images.SetKeyName(37, "odt.png");
+            this.imageList1.Images.SetKeyName(38, "otp.png");
+            this.imageList1.Images.SetKeyName(39, "ots.png");
+            this.imageList1.Images.SetKeyName(40, "ott.png");
+            this.imageList1.Images.SetKeyName(41, "pdf.png");
+            this.imageList1.Images.SetKeyName(42, "php.png");
+            this.imageList1.Images.SetKeyName(43, "png.png");
+            this.imageList1.Images.SetKeyName(44, "ppt.png");
+            this.imageList1.Images.SetKeyName(45, "psd.png");
+            this.imageList1.Images.SetKeyName(46, "py.png");
+            this.imageList1.Images.SetKeyName(47, "qt.png");
+            this.imageList1.Images.SetKeyName(48, "rar.png");
+            this.imageList1.Images.SetKeyName(49, "rb.png");
+            this.imageList1.Images.SetKeyName(50, "refresh.jpg");
+            this.imageList1.Images.SetKeyName(51, "reload — копия.png");
+            this.imageList1.Images.SetKeyName(52, "reload.png");
+            this.imageList1.Images.SetKeyName(53, "reload2.png");
+            this.imageList1.Images.SetKeyName(54, "rtf.png");
+            this.imageList1.Images.SetKeyName(55, "sass.png");
+            this.imageList1.Images.SetKeyName(56, "scss.png");
+            this.imageList1.Images.SetKeyName(57, "sql.png");
+            this.imageList1.Images.SetKeyName(58, "tga.png");
+            this.imageList1.Images.SetKeyName(59, "tgz.png");
+            this.imageList1.Images.SetKeyName(60, "tiff.png");
+            this.imageList1.Images.SetKeyName(61, "txt.png");
+            this.imageList1.Images.SetKeyName(62, "wav.png");
+            this.imageList1.Images.SetKeyName(63, "xls.png");
+            this.imageList1.Images.SetKeyName(64, "xlsx.png");
+            this.imageList1.Images.SetKeyName(65, "xml.png");
+            this.imageList1.Images.SetKeyName(66, "yml.png");
+            this.imageList1.Images.SetKeyName(67, "zip.png");
+            // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(5F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(1076, 602);
@@ -647,7 +669,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.Name = "MainForm";
-            this.Text = "MailClient0.1";
+            this.Text = "MailClient1.0";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
@@ -682,7 +704,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label SubjectLabel;
         private System.Windows.Forms.ListView listView3;
-        private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.GroupBox MessageContentBox;
         private System.Windows.Forms.ContextMenuStrip MessagesListVievContextMenu;
@@ -713,6 +734,8 @@
         private System.Windows.Forms.ToolStripMenuItem выходИзАккаунтаToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem выходИзАккаунтаToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem закрытьToolStripMenuItem;
+        private System.Windows.Forms.Button SortButton;
+        private System.Windows.Forms.ImageList imageList1;
     }
 }
 
